@@ -25,7 +25,7 @@ __all__ = [
 ]
 
 
-class CachedValidationEntry(BaseModel):  # type: ignore[misc]
+class CachedValidationEntry(BaseModel):
     """Represents a cached validation result entry."""
 
     model_config = ConfigDict(frozen=True)
@@ -54,7 +54,7 @@ class CachedValidationEntry(BaseModel):  # type: ignore[misc]
         return time.time() - self.timestamp
 
 
-class CacheStats(BaseModel):  # type: ignore[misc]
+class CacheStats(BaseModel):
     """Statistics for cache operations."""
 
     hits: int = Field(0, description="Number of cache hits")

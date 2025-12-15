@@ -678,11 +678,11 @@ class GitHubGraphQLClient:
 
     def get_api_stats(self) -> APICallStats:
         """Get current API call statistics."""
-        return self.api_stats.model_copy()  # type: ignore[no-any-return]
+        return self.api_stats.model_copy()
 
     def get_rate_limit_info(self) -> GitHubRateLimitInfo:
         """Get current rate limit information."""
-        return self._rate_limit_info.model_copy()  # type: ignore[no-any-return]
+        return self._rate_limit_info.model_copy()
 
     def _is_rate_limited(self) -> bool:
         """Check if we are currently rate-limited."""

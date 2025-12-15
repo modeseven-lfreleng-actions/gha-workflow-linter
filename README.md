@@ -120,10 +120,14 @@ The linter uses the following priority order:
 
 <!-- markdownlint-disable MD013 -->
 
-| Authentication | Requests/Hour | Recommended Use |
-|---------------|---------------|-----------------|
-| **With Token** | 5,000 | ✅ Production, CI/CD, large repositories |
-| **Without Token** | 60 | ⚠️ Small repositories, testing purposes |
+<!-- markdownlint-disable MD060 -->
+
+| Authentication    | Requests/Hour | Recommended Use                          |
+| ----------------- | ------------- | ---------------------------------------- |
+| **With Token**    | 5,000         | ✅ Production, CI/CD, large repositories |
+| **Without Token** | 60            | ⚠️ Small repositories, testing purposes  |
+
+<!-- markdownlint-enable MD060 -->
 
 <!-- markdownlint-enable MD013 -->
 
@@ -456,11 +460,15 @@ GHA Workflow Linter validates that references exist using GitHub's GraphQL API:
 
 <!-- markdownlint-disable MD013 -->
 
-| Type | Example | Validation Method | SHA Pinning |
-|------|---------|-------------------|-------------|
-| Commit SHA | `f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a` | GitHub GraphQL API | ✅ **Required by default** |
-| Semantic Version | `v1.2.3`, `1.0.0` | GitHub GraphQL API | ❌ Fails unless `--no-require-pinned-sha` |
-| Branch | `main`, `develop` | GitHub GraphQL API | ❌ Fails unless `--no-require-pinned-sha` |
+<!-- markdownlint-disable MD013 MD060 -->
+
+| Type             | Example                                    | Validation Method  | SHA Pinning                               |
+| ---------------- | ------------------------------------------ | ------------------ | ----------------------------------------- |
+| Commit SHA       | `f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a` | GitHub GraphQL API | ✅ **Required by default**                |
+| Semantic Version | `v1.2.3`, `1.0.0`                          | GitHub GraphQL API | ❌ Fails unless `--no-require-pinned-sha` |
+| Branch           | `main`, `develop`                          | GitHub GraphQL API | ❌ Fails unless `--no-require-pinned-sha` |
+
+<!-- markdownlint-enable MD013 MD060 -->
 
 <!-- markdownlint-enable MD013 -->
 
@@ -599,18 +607,18 @@ gha-workflow-linter lint --format json
 
 <!-- markdownlint-disable MD013 -->
 
-| Input | Description | Required | Default |
-|-------|-------------|----------|---------|
-| `path` | Path to scan for workflows | No | `.` |
-| `config-file` | Path to configuration file | No | |
-| `github-token` | GitHub API token | No | |
-| `log-level` | Logging level | No | `INFO` |
-| `output-format` | Output format (text, json) | No | `text` |
-| `fail-on-error` | Exit with error on failures | No | `true` |
-| `parallel` | Enable parallel processing | No | `true` |
-| `workers` | Number of parallel workers | No | `4` |
-| `exclude` | Comma-separated exclude patterns | No | |
-| `require-pinned-sha` | Require actions pinned to commit SHAs | No | `true` |
+| Input                | Description                           | Required | Default |
+| -------------------- | ------------------------------------- | -------- | ------- |
+| `path`               | Path to scan for workflows            | No       | `.`     |
+| `config-file`        | Path to configuration file            | No       |         |
+| `github-token`       | GitHub API token                      | No       |         |
+| `log-level`          | Logging level                         | No       | `INFO`  |
+| `output-format`      | Output format (text, json)            | No       | `text`  |
+| `fail-on-error`      | Exit with error on failures           | No       | `true`  |
+| `parallel`           | Enable parallel processing            | No       | `true`  |
+| `workers`            | Number of parallel workers            | No       | `4`     |
+| `exclude`            | Comma-separated exclude patterns      | No       |         |
+| `require-pinned-sha` | Require actions pinned to commit SHAs | No       | `true`  |
 
 <!-- markdownlint-enable MD013 -->
 
@@ -618,11 +626,11 @@ gha-workflow-linter lint --format json
 
 <!-- markdownlint-disable MD013 -->
 
-| Output | Description |
-|--------|-------------|
+| Output         | Description                 |
+| -------------- | --------------------------- |
 | `errors-found` | Number of validation errors |
-| `total-calls` | Total action calls scanned |
-| `scan-summary` | JSON summary of results |
+| `total-calls`  | Total action calls scanned  |
+| `scan-summary` | JSON summary of results     |
 
 <!-- markdownlint-enable MD013 -->
 
@@ -693,14 +701,14 @@ docker run --rm -v "$(pwd):/workspace" \
 
 <!-- markdownlint-disable MD013 -->
 
-| Error Type | Description | Resolution |
-|------------|-------------|------------|
-| `invalid_repository` | Repository not found | Check org/repo name spelling |
-| `invalid_reference` | Branch/tag/SHA not found | Verify reference exists |
-| `invalid_syntax` | Malformed action call | Fix YAML syntax |
-| `network_error` | Connection failed | Check network/credentials |
-| `timeout` | Validation timed out | Increase timeout settings |
-| `not_pinned_to_sha` | Action not using SHA | Pin to commit SHA or use `--no-require-pinned-sha` |
+| Error Type           | Description              | Resolution                                         |
+| -------------------- | ------------------------ | -------------------------------------------------- |
+| `invalid_repository` | Repository not found     | Check org/repo name spelling                       |
+| `invalid_reference`  | Branch/tag/SHA not found | Verify reference exists                            |
+| `invalid_syntax`     | Malformed action call    | Fix YAML syntax                                    |
+| `network_error`      | Connection failed        | Check network/credentials                          |
+| `timeout`            | Validation timed out     | Increase timeout settings                          |
+| `not_pinned_to_sha`  | Action not using SHA     | Pin to commit SHA or use `--no-require-pinned-sha` |
 
 <!-- markdownlint-enable MD013 -->
 

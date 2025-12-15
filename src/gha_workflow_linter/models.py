@@ -59,7 +59,7 @@ class ReferenceType(str, Enum):
     UNKNOWN = "unknown"
 
 
-class ActionCall(BaseModel):  # type: ignore[misc]
+class ActionCall(BaseModel):
     """Represents a GitHub Actions call found in a workflow."""
 
     model_config = ConfigDict(frozen=True)
@@ -77,7 +77,7 @@ class ActionCall(BaseModel):  # type: ignore[misc]
         ReferenceType.UNKNOWN, description="Type of reference"
     )
 
-    @field_validator("organization")  # type: ignore[misc]
+    @field_validator("organization")
     @classmethod
     def validate_organization(cls, v: str) -> str:
         """Validate GitHub organization name."""
@@ -100,7 +100,7 @@ class ActionCall(BaseModel):  # type: ignore[misc]
             )
         return v
 
-    @field_validator("repository")  # type: ignore[misc]
+    @field_validator("repository")
     @classmethod
     def validate_repository(cls, v: str) -> str:
         """Validate GitHub repository name."""
@@ -116,7 +116,7 @@ class ActionCall(BaseModel):  # type: ignore[misc]
         return f"{self.organization}/{self.repository}@{self.reference}"
 
 
-class ValidationError(BaseModel):  # type: ignore[misc]
+class ValidationError(BaseModel):
     """Represents a validation error for an action call."""
 
     model_config = ConfigDict(frozen=True)
@@ -134,7 +134,7 @@ class ValidationError(BaseModel):  # type: ignore[misc]
         )
 
 
-class ScanResult(BaseModel):  # type: ignore[misc]
+class ScanResult(BaseModel):
     """Results of scanning workflows."""
 
     model_config = ConfigDict(frozen=True)
@@ -159,7 +159,7 @@ class ScanResult(BaseModel):  # type: ignore[misc]
         return (self.valid_calls / self.total_action_calls) * 100
 
 
-class NetworkConfig(BaseModel):  # type: ignore[misc]
+class NetworkConfig(BaseModel):
     """Network-related configuration."""
 
     timeout_seconds: int = Field(30, description="Network request timeout")
@@ -168,21 +168,21 @@ class NetworkConfig(BaseModel):  # type: ignore[misc]
     rate_limit_delay_seconds: float = Field(0.1, description="Rate limit delay")
 
 
-class GitConfig(BaseModel):  # type: ignore[misc]
+class GitConfig(BaseModel):
     """Git operations configuration."""
 
     timeout_seconds: int = Field(30, description="Git command timeout")
     use_ssh_agent: bool = Field(
         True, description="Use SSH agent for authentication"
     )
-    max_parallel_operations: int = Field(
+    max_parallel_operations: int | None = Field(
         None, description="Max parallel Git operations (default: CPU count)"
     )
     clone_depth: int = Field(
         1, description="Git clone depth for shallow clones"
     )
 
-    @field_validator("max_parallel_operations")  # type: ignore[misc]
+    @field_validator("max_parallel_operations")
     @classmethod
     def validate_max_parallel_operations(cls, v: int | None) -> int | None:
         """Validate max parallel operations."""
@@ -193,7 +193,7 @@ class GitConfig(BaseModel):  # type: ignore[misc]
         return v
 
 
-class GitHubAPIConfig(BaseModel):  # type: ignore[misc]
+class GitHubAPIConfig(BaseModel):
     """GitHub API configuration."""
 
     base_url: str = Field(
@@ -237,7 +237,7 @@ class GitHubAPIConfig(BaseModel):  # type: ignore[misc]
         return os.environ.get("GITHUB_TOKEN")
 
 
-class APICallStats(BaseModel):  # type: ignore[misc]
+class APICallStats(BaseModel):
     """API call statistics tracking."""
 
     total_calls: int = Field(0, description="Total API calls made")
@@ -302,7 +302,7 @@ class APICallStats(BaseModel):  # type: ignore[misc]
         self.failed_calls += 1
 
 
-class GitHubRateLimitInfo(BaseModel):  # type: ignore[misc]
+class GitHubRateLimitInfo(BaseModel):
     """GitHub API rate limit information."""
 
     limit: int = Field(5000, description="Rate limit maximum")
@@ -323,7 +323,7 @@ class GitHubRateLimitInfo(BaseModel):  # type: ignore[misc]
         return (self.used / self.limit) * 100
 
 
-class CacheConfig(BaseModel):  # type: ignore[misc]
+class CacheConfig(BaseModel):
     """Local cache configuration."""
 
     enabled: bool = Field(True, description="Enable local caching")
@@ -351,7 +351,7 @@ class CacheConfig(BaseModel):  # type: ignore[misc]
         return self.cache_dir / self.cache_file
 
 
-class Config(BaseModel):  # type: ignore[misc]
+class Config(BaseModel):
     """Main configuration model."""
 
     model_config = ConfigDict()
@@ -388,19 +388,19 @@ class Config(BaseModel):  # type: ignore[misc]
     )
 
     network: NetworkConfig = Field(
-        default_factory=lambda: NetworkConfig(),
+        default_factory=NetworkConfig,
         description="Network configuration",
     )
     git: GitConfig = Field(
-        default_factory=lambda: GitConfig(),
+        default_factory=GitConfig,
         description="Git operations configuration",
     )
     github_api: GitHubAPIConfig = Field(
-        default_factory=lambda: GitHubAPIConfig(),
+        default_factory=GitHubAPIConfig,
         description="GitHub API configuration",
     )
     cache: CacheConfig = Field(
-        default_factory=lambda: CacheConfig(), description="Cache configuration"
+        default_factory=CacheConfig, description="Cache configuration"
     )
 
     @property
@@ -410,7 +410,7 @@ class Config(BaseModel):  # type: ignore[misc]
 
         return self.github_api.token or os.getenv("GITHUB_TOKEN")
 
-    @field_validator("parallel_workers")  # type: ignore[misc]
+    @field_validator("parallel_workers")
     @classmethod
     def validate_parallel_workers(cls, v: int) -> int:
         """Validate parallel worker count."""
@@ -421,7 +421,7 @@ class Config(BaseModel):  # type: ignore[misc]
         return v
 
 
-class CLIOptions(BaseModel):  # type: ignore[misc]
+class CLIOptions(BaseModel):
     """CLI command options."""
 
     path: Path = Field(Path.cwd(), description="Path to scan")
@@ -458,7 +458,7 @@ class CLIOptions(BaseModel):  # type: ignore[misc]
         False, description="Enable auto-fixing action calls with 'test' in comments"
     )
 
-    @field_validator("output_format")  # type: ignore[misc]
+    @field_validator("output_format")
     @classmethod
     def validate_output_format(cls, v: str) -> str:
         """Validate output format."""
@@ -469,7 +469,7 @@ class CLIOptions(BaseModel):  # type: ignore[misc]
             )
         return v
 
-    @field_validator("path")  # type: ignore[misc]
+    @field_validator("path")
     @classmethod
     def validate_path(cls, v: Path) -> Path:
         """Validate that path exists (only in non-test environments)."""
