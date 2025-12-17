@@ -817,4 +817,4 @@ class ActionCallValidator:
 
     def get_api_stats(self) -> APICallStats:
         """Get current API call statistics."""
-        return self.api_stats.model_copy()  # type: ignore[no-any-return]
+        return self.api_stats.model_copy()

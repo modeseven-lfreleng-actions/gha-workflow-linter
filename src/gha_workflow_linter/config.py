@@ -8,6 +8,7 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
+from typing import Any
 
 from pydantic import ValidationError
 import yaml
@@ -36,7 +37,7 @@ class ConfigManager:
             ValueError: If configuration is invalid
         """
         # Start with default config
-        config_data: dict[str, object] = {}
+        config_data: dict[str, Any] = {}
 
         # Load from default location if no file specified
         if config_file is None:
@@ -105,7 +106,7 @@ class ConfigManager:
 
         return None
 
-    def _load_config_file(self, config_file: Path) -> dict[str, object]:
+    def _load_config_file(self, config_file: Path) -> dict[str, Any]:
         """
         Load configuration from YAML file.
 

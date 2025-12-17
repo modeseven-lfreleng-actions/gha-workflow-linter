@@ -109,7 +109,7 @@ class TestActionCall:
 
         # Should raise error when trying to modify
         with pytest.raises(ValueError):  # ValidationError from pydantic
-            call.line_number = 20
+            call.line_number = 20  # type: ignore[misc]
 
 
 class TestValidationError:

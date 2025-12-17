@@ -124,7 +124,7 @@ app = typer.Typer(
 
 
 # Add custom help option to main app
-@app.callback(invoke_without_command=True)  # type: ignore[misc]
+@app.callback(invoke_without_command=True)
 def main_callback(
     ctx: typer.Context,
     _help: bool = typer.Option(
@@ -186,7 +186,7 @@ def setup_logging(log_level: LogLevel, quiet: bool = False) -> None:
     logging.getLogger("httpcore.http11").setLevel(logging.WARNING)
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def lint(
     path: Path | None = typer.Argument(
         None,
@@ -535,7 +535,7 @@ def lint(
     raise typer.Exit(exit_code)
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def cache(
     info: bool = typer.Option(False, "--info", help="Show cache information"),
     cleanup: bool = typer.Option(

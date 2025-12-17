@@ -66,7 +66,7 @@ jobs:
                 base_url="https://nonexistent-domain-for-testing.invalid",
                 graphql_url="https://nonexistent-domain-for-testing.invalid/graphql",
             ),
-            cache=CacheConfig(enabled=True, cache_dir=str(temp_cache_dir)),
+            cache=CacheConfig(enabled=True, cache_dir=temp_cache_dir),
         )
 
     @pytest.fixture
@@ -84,7 +84,7 @@ jobs:
                 base_url="https://api.github.com",
                 graphql_url="https://api.github.com/graphql",
             ),
-            cache=CacheConfig(enabled=True, cache_dir=str(temp_cache_dir)),
+            cache=CacheConfig(enabled=True, cache_dir=temp_cache_dir),
         )
 
     def test_dns_resolution_failure_exits_with_error_code_1(
