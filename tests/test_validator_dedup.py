@@ -30,12 +30,12 @@ def test_config_no_sha_pinning() -> Config:
     """Test configuration with SHA pinning disabled for deduplication tests."""
     # Use a temporary cache directory to avoid interference between tests
     temp_dir = Path(tempfile.mkdtemp())
-    cache_config = CacheConfig(
+    cache_config = CacheConfig(  # pyright: ignore[reportCallIssue]
         enabled=False,  # Disable cache for these tests
         cache_dir=temp_dir,
         cache_file="test_cache.json",
     )
-    return Config(
+    return Config(  # pyright: ignore[reportCallIssue]
         log_level=LogLevel.DEBUG,
         parallel_workers=2,
         scan_extensions=[".yml", ".yaml"],
@@ -139,7 +139,7 @@ class TestValidatorDeduplication:
             )
 
             # Mock API stats
-            mock_stats = APICallStats(
+            mock_stats = APICallStats(  # pyright: ignore[reportCallIssue]
                 total_calls=4,  # 2 repos + 2 refs
                 graphql_calls=2,
                 rest_calls=0,
@@ -208,7 +208,7 @@ class TestValidatorDeduplication:
                 }
             )
 
-            mock_stats = APICallStats(
+            mock_stats = APICallStats(  # pyright: ignore[reportCallIssue]
                 total_calls=0,
                 graphql_calls=0,
                 rest_calls=0,
@@ -314,7 +314,7 @@ class TestValidatorDeduplication:
                 }
             )
 
-            mock_stats = APICallStats(
+            mock_stats = APICallStats(  # pyright: ignore[reportCallIssue]
                 total_calls=4,  # 2 repos + 2 refs
                 graphql_calls=4,
                 rest_calls=0,
@@ -430,7 +430,7 @@ class TestValidatorDeduplication:
                 }
             )
 
-            mock_stats = APICallStats(
+            mock_stats = APICallStats(  # pyright: ignore[reportCallIssue]
                 total_calls=0,
                 graphql_calls=0,
                 rest_calls=0,

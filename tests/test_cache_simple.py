@@ -25,7 +25,7 @@ class TestCachedValidationEntry:
         """Test CachedValidationEntry initialization."""
         result = ValidationResult.VALID
 
-        entry = CachedValidationEntry(
+        entry = CachedValidationEntry(  # pyright: ignore[reportCallIssue]
             repository="actions/checkout",
             reference="v4",
             result=result,
@@ -42,7 +42,7 @@ class TestCachedValidationEntry:
         """Test checking if entry is not expired."""
         result = ValidationResult.VALID
 
-        entry = CachedValidationEntry(
+        entry = CachedValidationEntry(  # pyright: ignore[reportCallIssue]
             repository="actions/checkout",
             reference="v4",
             result=result,
@@ -58,7 +58,7 @@ class TestCachedValidationEntry:
         result = ValidationResult.VALID
 
         # Create entry with old timestamp
-        entry = CachedValidationEntry(
+        entry = CachedValidationEntry(  # pyright: ignore[reportCallIssue]
             repository="actions/checkout",
             reference="v4",
             result=result,
@@ -75,7 +75,7 @@ class TestCachedValidationEntry:
 
         # Create entry with timestamp 100 seconds ago
         old_time = time.time() - 100
-        entry = CachedValidationEntry(
+        entry = CachedValidationEntry(  # pyright: ignore[reportCallIssue]
             repository="actions/checkout",
             reference="v4",
             result=result,
@@ -93,9 +93,9 @@ class TestValidationCache:
     def setup_method(self) -> None:
         """Set up test fixtures."""
         # Use a temporary file to avoid interference with real cache
-        self.temp_cache_file_path = tempfile.mktemp(suffix=".json")
+        self.temp_cache_file_path = tempfile.mktemp(suffix=".json")  # pyright: ignore[reportUninitializedInstanceVariable]
 
-        self.cache_config = CacheConfig(
+        self.cache_config = CacheConfig(  # pyright: ignore[reportUninitializedInstanceVariable, reportCallIssue]
             enabled=True,
             cache_dir=Path(self.temp_cache_file_path).parent,
             cache_file=Path(self.temp_cache_file_path).name,
@@ -114,7 +114,7 @@ class TestValidationCache:
 
     def test_init_with_default_config(self) -> None:
         """Test ValidationCache with default config."""
-        default_config = CacheConfig()
+        default_config = CacheConfig()  # pyright: ignore[reportCallIssue]
         cache = ValidationCache(default_config)
         assert isinstance(cache.config, CacheConfig)
 
@@ -126,14 +126,14 @@ class TestValidationCache:
 
     def test_enabled_true(self) -> None:
         """Test cache enabled property when enabled."""
-        cache_config = CacheConfig(enabled=True)
+        cache_config = CacheConfig(enabled=True)  # pyright: ignore[reportCallIssue]
         cache = ValidationCache(cache_config)
 
         assert cache.config.enabled is True
 
     def test_enabled_false(self) -> None:
         """Test cache enabled property when disabled."""
-        cache_config = CacheConfig(enabled=False)
+        cache_config = CacheConfig(enabled=False)  # pyright: ignore[reportCallIssue]
         cache = ValidationCache(cache_config)
 
         assert cache.config.enabled is False
@@ -167,7 +167,7 @@ class TestValidationCache:
         cache = ValidationCache(self.cache_config)
 
         # Add an expired entry
-        old_entry = CachedValidationEntry(
+        old_entry = CachedValidationEntry(  # pyright: ignore[reportCallIssue]
             repository="old/repo",
             reference="v1",
             result=ValidationResult.VALID,
@@ -184,7 +184,7 @@ class TestValidationCache:
 
     def test_cache_disabled_operations(self) -> None:
         """Test cache operations when disabled."""
-        cache_config = CacheConfig(enabled=False)
+        cache_config = CacheConfig(enabled=False)  # pyright: ignore[reportCallIssue]
         cache = ValidationCache(cache_config)
 
         # Should not raise when cache is disabled

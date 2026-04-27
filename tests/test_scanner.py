@@ -18,8 +18,8 @@ class TestWorkflowScanner:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.config = Config()
-        self.scanner = WorkflowScanner(self.config)
+        self.config = Config()  # pyright: ignore[reportUninitializedInstanceVariable, reportCallIssue]
+        self.scanner = WorkflowScanner(self.config)  # pyright: ignore[reportUninitializedInstanceVariable]
 
     def test_init(self) -> None:
         """Test WorkflowScanner initialization."""
@@ -91,7 +91,7 @@ jobs:
 
     def test_find_workflow_files_exclude_patterns(self) -> None:
         """Test excluding files based on patterns."""
-        config = Config(exclude_patterns=["test*", "*.tmp"])
+        config = Config(exclude_patterns=["test*", "*.tmp"])  # pyright: ignore[reportCallIssue]
         scanner = WorkflowScanner(config)
 
         workflow_content = "name: Test\non: [push]\njobs: {}"
@@ -293,7 +293,7 @@ on: [push]
 
     def test_should_exclude_file_basic(self) -> None:
         """Test checking if file should be excluded."""
-        config = Config(exclude_patterns=["test", ".tmp"])
+        config = Config(exclude_patterns=["test", ".tmp"])  # pyright: ignore[reportCallIssue]
         scanner = WorkflowScanner(config)
 
         # Should exclude (pattern matches substring in path)
@@ -331,7 +331,7 @@ jobs: invalid [
 
         results = {
             Path("test1.yml"): {
-                1: ActionCall(
+                1: ActionCall(  # pyright: ignore[reportCallIssue]
                     raw_line="uses: actions/checkout@v4",
                     line_number=1,
                     organization="actions",
@@ -340,7 +340,7 @@ jobs: invalid [
                 )
             },
             Path("test2.yml"): {
-                2: ActionCall(
+                2: ActionCall(  # pyright: ignore[reportCallIssue]
                     raw_line="uses: actions/setup-node@abc123",
                     line_number=2,
                     organization="actions",
@@ -467,7 +467,7 @@ jobs:
 
     def test_should_exclude_file_patterns(self) -> None:
         """Test checking if file should be excluded based on patterns."""
-        config = Config(exclude_patterns=["test", "tmp"])
+        config = Config(exclude_patterns=["test", "tmp"])  # pyright: ignore[reportCallIssue]
         scanner = WorkflowScanner(config)
 
         # Should exclude (pattern in path string)
@@ -479,7 +479,7 @@ jobs:
 
     def test_should_exclude_file_no_patterns(self) -> None:
         """Test checking exclude when no patterns are configured."""
-        config = Config(exclude_patterns=[])
+        config = Config(exclude_patterns=[])  # pyright: ignore[reportCallIssue]
         scanner = WorkflowScanner(config)
 
         # Should never exclude when no patterns configured

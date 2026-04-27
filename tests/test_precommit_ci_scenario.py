@@ -91,13 +91,13 @@ jobs:
 
         # Use non-existent domain to naturally cause DNS failures
         temp_cache_dir = Path(tempfile.mkdtemp()) / "test_cache"
-        return Config(
-            github_api=GitHubAPIConfig(
+        return Config(  # pyright: ignore[reportCallIssue]
+            github_api=GitHubAPIConfig(  # pyright: ignore[reportCallIssue]
                 token="fake_token",  # Fake token to force GitHub API method
                 base_url="https://nonexistent-domain-for-testing.invalid",
                 graphql_url="https://nonexistent-domain-for-testing.invalid/graphql",
             ),
-            cache=CacheConfig(enabled=False, cache_dir=temp_cache_dir),
+            cache=CacheConfig(enabled=False, cache_dir=temp_cache_dir),  # pyright: ignore[reportCallIssue]
             validation_method=ValidationMethod.GITHUB_API,  # Force GitHub API validation
         )
 
@@ -111,7 +111,7 @@ jobs:
         After the fix, it should properly report the network issue.
         Uses non-existent domain to naturally cause DNS resolution failure.
         """
-        options = CLIOptions(path=sample_workflows)
+        options = CLIOptions(path=sample_workflows)  # pyright: ignore[reportCallIssue]
 
         # No mocking needed - config_with_no_token uses non-existent domain
         # which will naturally cause DNS resolution failure
@@ -134,7 +134,7 @@ jobs:
 
         action_calls = {
             Path("testing.yaml"): {
-                1: ActionCall(
+                1: ActionCall(  # pyright: ignore[reportCallIssue]
                     raw_line="      - uses: unique-test-org/unique-action@abc123",
                     organization="unique-test-org",
                     repository="unique-action",
@@ -167,7 +167,7 @@ jobs:
 
         action_calls = {
             Path("test.yaml"): {
-                1: ActionCall(
+                1: ActionCall(  # pyright: ignore[reportCallIssue]
                     raw_line="      - uses: unique-org/unique-action@def456",
                     organization="unique-org",
                     repository="unique-action",
@@ -197,7 +197,7 @@ jobs:
         The original error was confusing because it showed:
         "❌ Invalid action call in workflow" when the real issue was network connectivity.
         """
-        options = CLIOptions(path=sample_workflows)
+        options = CLIOptions(path=sample_workflows)  # pyright: ignore[reportCallIssue]
 
         with patch("httpx.AsyncClient.post") as mock_post:
             mock_post.side_effect = httpx.RequestError(
@@ -234,7 +234,7 @@ jobs:
 
         This ensures our error handling doesn't break normal operation.
         """
-        options = CLIOptions(path=sample_workflows)
+        options = CLIOptions(path=sample_workflows)  # pyright: ignore[reportCallIssue]
 
         with patch("httpx.AsyncClient.post") as mock_post:
             # Mock successful API responses

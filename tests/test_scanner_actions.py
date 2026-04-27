@@ -18,8 +18,8 @@ class TestActionFileScanning:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.config = Config()
-        self.scanner = WorkflowScanner(self.config)
+        self.config = Config()  # pyright: ignore[reportUninitializedInstanceVariable, reportCallIssue]
+        self.scanner = WorkflowScanner(self.config)  # pyright: ignore[reportUninitializedInstanceVariable]
 
     def create_temp_action(
         self, content: str, name: str = "action.yml", subdir: str | None = None
@@ -183,7 +183,7 @@ runs:
   steps:
     - uses: actions/checkout@v4
 """
-        config = Config(skip_actions=True)
+        config = Config(skip_actions=True)  # pyright: ignore[reportCallIssue]
         scanner = WorkflowScanner(config)
 
         temp_dir = self.create_temp_action(action_content, "action.yml")
@@ -206,7 +206,7 @@ runs:
   steps:
     - uses: actions/checkout@v4
 """
-        config = Config(skip_actions=False)
+        config = Config(skip_actions=False)  # pyright: ignore[reportCallIssue]
         scanner = WorkflowScanner(config)
 
         temp_dir = self.create_temp_action(action_content, "action.yml")
@@ -312,7 +312,7 @@ runs:
   steps:
     - uses: actions/checkout@v4
 """
-        config = Config(exclude_patterns=["test"])
+        config = Config(exclude_patterns=["test"])  # pyright: ignore[reportCallIssue]
         scanner = WorkflowScanner(config)
 
         temp_dir = Path(tempfile.mkdtemp())
@@ -449,7 +449,7 @@ runs:
 
         results = {
             Path("ci.yml"): {
-                1: ActionCall(
+                1: ActionCall(  # pyright: ignore[reportCallIssue]
                     raw_line="uses: actions/checkout@v4",
                     line_number=1,
                     organization="actions",
@@ -458,7 +458,7 @@ runs:
                 )
             },
             Path("action.yml"): {
-                2: ActionCall(
+                2: ActionCall(  # pyright: ignore[reportCallIssue]
                     raw_line="uses: actions/setup-node@v3",
                     line_number=2,
                     organization="actions",

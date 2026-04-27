@@ -23,7 +23,7 @@ class TestCacheConfig:
 
     def test_default_config(self) -> None:
         """Test default cache configuration."""
-        config = CacheConfig()
+        config = CacheConfig()  # pyright: ignore[reportCallIssue]
 
         assert config.enabled is True
         assert (
@@ -36,7 +36,7 @@ class TestCacheConfig:
 
     def test_cache_file_path(self) -> None:
         """Test cache file path property."""
-        config = CacheConfig()
+        config = CacheConfig()  # pyright: ignore[reportCallIssue]
         expected_path = config.cache_dir / config.cache_file
         assert config.cache_file_path == expected_path
 
@@ -66,7 +66,7 @@ class TestCachedValidationEntry:
     def test_entry_creation(self) -> None:
         """Test creating a cache entry."""
         timestamp = time.time()
-        entry = CachedValidationEntry(
+        entry = CachedValidationEntry(  # pyright: ignore[reportCallIssue]
             repository="owner/repo",
             reference="v1.0.0",
             result=ValidationResult.VALID,
@@ -86,7 +86,7 @@ class TestCachedValidationEntry:
         """Test expiration checking."""
         # Create entry that's 10 seconds old
         old_timestamp = time.time() - 10
-        entry = CachedValidationEntry(
+        entry = CachedValidationEntry(  # pyright: ignore[reportCallIssue]
             repository="owner/repo",
             reference="v1.0.0",
             result=ValidationResult.VALID,
@@ -103,7 +103,7 @@ class TestCachedValidationEntry:
     def test_age_seconds(self) -> None:
         """Test age calculation."""
         timestamp = time.time() - 5
-        entry = CachedValidationEntry(
+        entry = CachedValidationEntry(  # pyright: ignore[reportCallIssue]
             repository="owner/repo",
             reference="v1.0.0",
             result=ValidationResult.VALID,
@@ -143,7 +143,7 @@ class TestValidationCache:
 
     def test_cache_disabled(self) -> None:
         """Test cache behavior when disabled."""
-        config = CacheConfig(enabled=False)
+        config = CacheConfig(enabled=False)  # pyright: ignore[reportCallIssue]
         cache = ValidationCache(config)
 
         # Should return None for all operations
@@ -178,7 +178,7 @@ class TestValidationCache:
     def test_cache_expiration(self, temp_cache_config: CacheConfig) -> None:
         """Test cache entry expiration."""
         # Set short TTL
-        temp_cache_config = CacheConfig(
+        temp_cache_config = CacheConfig(  # pyright: ignore[reportCallIssue]
             enabled=True,
             cache_dir=temp_cache_config.cache_dir,
             cache_file="test_cache.json",
@@ -263,7 +263,7 @@ class TestValidationCache:
                 None,
             ),
         ]
-        cache.put_batch(batch_data)
+        cache.put_batch(batch_data)  # pyright: ignore[reportArgumentType]
 
         # Test batch get
         repo_refs = [
@@ -286,7 +286,7 @@ class TestValidationCache:
     def test_cache_size_limit(self, temp_cache_config: CacheConfig) -> None:
         """Test cache size limit enforcement."""
         # Set small cache size
-        temp_cache_config = CacheConfig(
+        temp_cache_config = CacheConfig(  # pyright: ignore[reportCallIssue]
             enabled=True,
             cache_dir=temp_cache_config.cache_dir,
             cache_file="test_cache.json",
@@ -318,7 +318,7 @@ class TestValidationCache:
     def test_cache_cleanup(self, temp_cache_config: CacheConfig) -> None:
         """Test cache cleanup of expired entries."""
         # Set short TTL
-        temp_cache_config = CacheConfig(
+        temp_cache_config = CacheConfig(  # pyright: ignore[reportCallIssue]
             enabled=True,
             cache_dir=temp_cache_config.cache_dir,
             cache_file="test_cache.json",

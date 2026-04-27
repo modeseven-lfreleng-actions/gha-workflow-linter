@@ -40,8 +40,8 @@ class TestNetworkErrorHandling:
     @pytest.fixture
     def config(self) -> Config:
         """Create test configuration."""
-        return Config(
-            github_api=GitHubAPIConfig(
+        return Config(  # pyright: ignore[reportCallIssue]
+            github_api=GitHubAPIConfig(  # pyright: ignore[reportCallIssue]
                 token="test-token",
                 base_url="https://api.github.com",
                 graphql_url="https://api.github.com/graphql",
@@ -214,13 +214,13 @@ class TestValidatorErrorHandling:
         """Create test configuration with caching disabled."""
         from gha_workflow_linter.models import CacheConfig
 
-        return Config(
-            github_api=GitHubAPIConfig(
+        return Config(  # pyright: ignore[reportCallIssue]
+            github_api=GitHubAPIConfig(  # pyright: ignore[reportCallIssue]
                 token="test-token",
                 base_url="https://api.github.com",
                 graphql_url="https://api.github.com/graphql",
             ),
-            cache=CacheConfig(enabled=False),
+            cache=CacheConfig(enabled=False),  # pyright: ignore[reportCallIssue]
         )
 
     @pytest.fixture
@@ -228,7 +228,7 @@ class TestValidatorErrorHandling:
         """Create test action calls."""
         return {
             Path("test.yaml"): {
-                1: ActionCall(
+                1: ActionCall(  # pyright: ignore[reportCallIssue]
                     raw_line="      - uses: actions/checkout@v4",
                     organization="actions",
                     repository="checkout",
@@ -389,13 +389,13 @@ class TestCLIErrorHandling:
             ReferenceType,
         )
 
-        config = Config()
-        options = CLIOptions(path=Path("."))
+        config = Config()  # pyright: ignore[reportCallIssue]
+        options = CLIOptions(path=Path("."))  # pyright: ignore[reportCallIssue]
 
         # Create mock workflow calls to trigger validation
         mock_workflow_calls = {
             Path("test.yaml"): {
-                1: ActionCall(
+                1: ActionCall(  # pyright: ignore[reportCallIssue]
                     raw_line="- uses: actions/checkout@v4",
                     line_number=1,
                     organization="actions",
@@ -441,13 +441,13 @@ class TestCLIErrorHandling:
             ReferenceType,
         )
 
-        config = Config()
-        options = CLIOptions(path=Path("."))
+        config = Config()  # pyright: ignore[reportCallIssue]
+        options = CLIOptions(path=Path("."))  # pyright: ignore[reportCallIssue]
 
         # Create mock workflow calls to trigger validation
         mock_workflow_calls = {
             Path("test.yaml"): {
-                1: ActionCall(
+                1: ActionCall(  # pyright: ignore[reportCallIssue]
                     raw_line="- uses: actions/checkout@v4",
                     line_number=1,
                     organization="actions",

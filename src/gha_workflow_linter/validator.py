@@ -56,7 +56,7 @@ class ActionCallValidator:
         self.logger = logging.getLogger(__name__)
         self._github_client: GitHubGraphQLClient | None = None
         self._git_client: GitValidationClient | None = None
-        self.api_stats = APICallStats()
+        self.api_stats = APICallStats()  # pyright: ignore[reportCallIssue]
         self._cache = ValidationCache(config.cache)
         self._validation_method: ValidationMethod | None = None
 
@@ -204,7 +204,9 @@ class ActionCallValidator:
         Returns:
             List of validation errors
         """
-        self.logger.debug("Starting action call validation using Git operations")
+        self.logger.debug(
+            "Starting action call validation using Git operations"
+        )
         return await self._perform_validation(
             action_calls, progress, task_id, use_github_api=False
         )
@@ -564,7 +566,9 @@ class ActionCallValidator:
                     and action_call.reference_type != ReferenceType.COMMIT_SHA
                 ):
                     # Add error for each occurrence of this unpinned call
-                    for file_path, actual_action_call in call_locations[call_key]:
+                    for file_path, actual_action_call in call_locations[
+                        call_key
+                    ]:
                         error = ValidationError(
                             file_path=file_path,
                             action_call=actual_action_call,
@@ -614,7 +618,11 @@ class ActionCallValidator:
             task = progress.tasks[task_id]
             # Only update if not already completed
             if task.total is not None and task.completed < task.total:
-                progress.update(task_id, completed=task.total, description="Validation complete")
+                progress.update(
+                    task_id,
+                    completed=task.total,
+                    description="Validation complete",
+                )
 
         return errors
 

@@ -22,7 +22,7 @@ class TestConfigManager:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.config_manager = ConfigManager()
+        self.config_manager = ConfigManager()  # pyright: ignore[reportUninitializedInstanceVariable]
 
     def test_init(self) -> None:
         """Test ConfigManager initialization."""

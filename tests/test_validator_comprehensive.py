@@ -34,8 +34,8 @@ class TestActionCallValidator:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.config = Config(require_pinned_sha=False)
-        self.validator = ActionCallValidator(self.config)
+        self.config = Config(require_pinned_sha=False)  # pyright: ignore[reportUninitializedInstanceVariable, reportCallIssue]
+        self.validator = ActionCallValidator(self.config)  # pyright: ignore[reportUninitializedInstanceVariable]
 
     def test_init(self) -> None:
         """Test validator initialization."""
@@ -183,7 +183,7 @@ class TestActionCallValidator:
                 error = result[0]
                 assert error.file_path == Path("test.yml")
                 assert error.result == ValidationResult.INVALID_REPOSITORY
-                assert "not found" in error.error_message.lower()
+                assert "not found" in error.error_message.lower()  # pyright: ignore[reportOptionalMemberAccess]
 
     @pytest.mark.asyncio
     async def test_validate_action_calls_async_reference_not_found(
@@ -234,13 +234,13 @@ class TestActionCallValidator:
                 error = result[0]
                 assert error.file_path == Path("test.yml")
                 assert error.result == ValidationResult.INVALID_REFERENCE
-                assert "invalid" in error.error_message.lower()
+                assert "invalid" in error.error_message.lower()  # pyright: ignore[reportOptionalMemberAccess]
 
     @pytest.mark.asyncio
     async def test_validate_action_calls_async_unpinned_sha(self) -> None:
         """Test validation with unpinned SHA when required."""
         # Configure to require pinned SHAs
-        config = Config(require_pinned_sha=True)
+        config = Config(require_pinned_sha=True)  # pyright: ignore[reportCallIssue]
         validator = ActionCallValidator(config)
 
         action_call = ActionCall(
@@ -500,7 +500,9 @@ class TestActionCallValidator:
 
             async with self.validator:
                 result = await self.validator.validate_action_calls_async(
-                    workflow_calls, mock_progress, mock_task_id
+                    workflow_calls,
+                    mock_progress,
+                    mock_task_id,  # pyright: ignore[reportArgumentType]
                 )
 
                 assert result == []
@@ -537,7 +539,7 @@ class TestActionCallValidator:
     def test_extract_repository_for_validation_workflow_call(self) -> None:
         """Test repository extraction for reusable workflow calls."""
         # Test workflow call with full path
-        workflow_call = ActionCall(
+        workflow_call = ActionCall(  # pyright: ignore[reportCallIssue]
             raw_line="uses: lfit/releng-reusable-workflows/.github/workflows/test.yaml@main",
             line_number=1,
             organization="lfit",
@@ -555,7 +557,7 @@ class TestActionCallValidator:
     def test_extract_repository_for_validation_action_call(self) -> None:
         """Test repository extraction for regular action calls."""
         # Test regular action call
-        action_call = ActionCall(
+        action_call = ActionCall(  # pyright: ignore[reportCallIssue]
             raw_line="uses: actions/checkout@v4",
             line_number=1,
             organization="actions",
@@ -571,7 +573,7 @@ class TestActionCallValidator:
     def test_combine_validation_results_uses_extracted_repo_name(self) -> None:
         """Test that _combine_validation_results uses extracted repository names for workflows."""
         # Create a workflow call
-        workflow_call = ActionCall(
+        workflow_call = ActionCall(  # pyright: ignore[reportCallIssue]
             raw_line="uses: lfit/releng-reusable-workflows/.github/workflows/test.yaml@1a9d1394836d7511179d478facd9466a9e45596e",
             line_number=1,
             organization="lfit",
@@ -618,10 +620,10 @@ class TestActionCallValidator:
 
     def test_merge_api_stats(self) -> None:
         """Test merging API statistics."""
-        stats1 = APICallStats()
+        stats1 = APICallStats()  # pyright: ignore[reportCallIssue]
         stats1.graphql_calls = 5
 
-        stats2 = APICallStats()
+        stats2 = APICallStats()  # pyright: ignore[reportCallIssue]
         stats2.graphql_calls = 3
 
         # The _merge_api_stats method doesn't exist, test basic stats instead
@@ -674,8 +676,8 @@ class TestActionCallValidator:
         """Test getting API statistics."""
         # Set up some stats in the validator
         if hasattr(self.validator, "_api_stats"):
-            self.validator._api_stats = APICallStats()
-            self.validator._api_stats.graphql_calls = 5
+            self.validator._api_stats = APICallStats()  # pyright: ignore[reportCallIssue, reportAttributeAccessIssue]
+            self.validator._api_stats.graphql_calls = 5  # pyright: ignore[reportAttributeAccessIssue]
 
             stats = self.validator.get_api_stats()
             assert stats.graphql_calls == 5
@@ -690,8 +692,8 @@ class TestActionCallValidatorDeduplication:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.config = Config(require_pinned_sha=False)
-        self.validator = ActionCallValidator(self.config)
+        self.config = Config(require_pinned_sha=False)  # pyright: ignore[reportUninitializedInstanceVariable, reportCallIssue]
+        self.validator = ActionCallValidator(self.config)  # pyright: ignore[reportUninitializedInstanceVariable]
 
     @pytest.mark.asyncio
     async def test_deduplication_reduces_api_calls(self) -> None:

@@ -96,13 +96,13 @@ jobs:
 @pytest.fixture
 def test_config() -> Config:
     """Test configuration with reduced timeouts and workers."""
-    return Config(
+    return Config(  # pyright: ignore[reportCallIssue]
         log_level=LogLevel.DEBUG,
         parallel_workers=2,
         scan_extensions=[".yml", ".yaml"],
         exclude_patterns=["**/node_modules/**", "**/test/**"],
         require_pinned_sha=True,
-        git=GitConfig(timeout_seconds=10, use_ssh_agent=True),
+        git=GitConfig(timeout_seconds=10, use_ssh_agent=True),  # pyright: ignore[reportCallIssue]
         network=NetworkConfig(
             timeout_seconds=10,
             max_retries=2,

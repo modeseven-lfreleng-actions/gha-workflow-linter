@@ -70,7 +70,7 @@ class TestActionCall:
 
     def test_init_basic(self) -> None:
         """Test ActionCall initialization."""
-        call = ActionCall(
+        call = ActionCall(  # pyright: ignore[reportCallIssue]
             raw_line="uses: actions/checkout@v4",
             line_number=10,
             organization="actions",
@@ -87,7 +87,7 @@ class TestActionCall:
 
     def test_init_with_comment(self) -> None:
         """Test ActionCall initialization with comment."""
-        call = ActionCall(
+        call = ActionCall(  # pyright: ignore[reportCallIssue]
             raw_line="uses: actions/checkout@v4 # Get code",
             line_number=5,
             organization="actions",
@@ -100,7 +100,7 @@ class TestActionCall:
 
     def test_frozen_model(self) -> None:
         """Test that ActionCall is frozen."""
-        call = ActionCall(
+        call = ActionCall(  # pyright: ignore[reportCallIssue]
             raw_line="uses: actions/checkout@v4",
             line_number=10,
             organization="actions",
@@ -118,7 +118,7 @@ class TestValidationError:
 
     def test_init_basic(self) -> None:
         """Test ValidationError initialization."""
-        action_call = ActionCall(
+        action_call = ActionCall(  # pyright: ignore[reportCallIssue]
             raw_line="uses: actions/checkout@v4",
             line_number=10,
             organization="actions",
@@ -126,7 +126,7 @@ class TestValidationError:
             reference="v4",
         )
 
-        error = ValidationError(
+        error = ValidationError(  # pyright: ignore[reportCallIssue]
             file_path=Path("test.yml"),
             action_call=action_call,
             result=ValidationResult.INVALID_REPOSITORY,
@@ -139,7 +139,7 @@ class TestValidationError:
 
     def test_init_with_error_message(self) -> None:
         """Test ValidationError with error message."""
-        action_call = ActionCall(
+        action_call = ActionCall(  # pyright: ignore[reportCallIssue]
             raw_line="uses: actions/checkout@v4",
             line_number=10,
             organization="actions",
@@ -158,7 +158,7 @@ class TestValidationError:
 
     def test_str_representation(self) -> None:
         """Test string representation of ValidationError."""
-        action_call = ActionCall(
+        action_call = ActionCall(  # pyright: ignore[reportCallIssue]
             raw_line="uses: actions/checkout@v4",
             line_number=10,
             organization="actions",
@@ -166,7 +166,7 @@ class TestValidationError:
             reference="v4",
         )
 
-        error = ValidationError(
+        error = ValidationError(  # pyright: ignore[reportCallIssue]
             file_path=Path("test.yml"),
             action_call=action_call,
             result=ValidationResult.INVALID_REPOSITORY,
@@ -183,7 +183,7 @@ class TestScanResult:
 
     def test_init_defaults(self) -> None:
         """Test ScanResult with default values."""
-        result = ScanResult()
+        result = ScanResult()  # pyright: ignore[reportCallIssue]
 
         assert result.total_workflows == 0
         assert result.total_action_calls == 0
@@ -192,7 +192,7 @@ class TestScanResult:
 
     def test_init_with_values(self) -> None:
         """Test ScanResult with specific values."""
-        action_call = ActionCall(
+        action_call = ActionCall(  # pyright: ignore[reportCallIssue]
             raw_line="uses: actions/checkout@v4",
             line_number=10,
             organization="actions",
@@ -200,7 +200,7 @@ class TestScanResult:
             reference="v4",
         )
 
-        error = ValidationError(
+        error = ValidationError(  # pyright: ignore[reportCallIssue]
             file_path=Path("test.yml"),
             action_call=action_call,
             result=ValidationResult.INVALID_REPOSITORY,
@@ -220,13 +220,13 @@ class TestScanResult:
 
     def test_success_rate_property(self) -> None:
         """Test success_rate property calculation."""
-        result = ScanResult(total_action_calls=10, valid_calls=8)
+        result = ScanResult(total_action_calls=10, valid_calls=8)  # pyright: ignore[reportCallIssue]
 
         assert result.success_rate == 80.0
 
     def test_success_rate_no_calls(self) -> None:
         """Test success_rate with no calls."""
-        result = ScanResult()
+        result = ScanResult()  # pyright: ignore[reportCallIssue]
         assert result.success_rate == 100.0
 
 
@@ -235,7 +235,7 @@ class TestNetworkConfig:
 
     def test_init_defaults(self) -> None:
         """Test NetworkConfig with default values."""
-        config = NetworkConfig()
+        config = NetworkConfig()  # pyright: ignore[reportCallIssue]
 
         assert config.timeout_seconds == 30
         assert config.max_retries == 3
@@ -262,14 +262,14 @@ class TestGitConfig:
 
     def test_init_defaults(self) -> None:
         """Test GitConfig with default values."""
-        config = GitConfig()
+        config = GitConfig()  # pyright: ignore[reportCallIssue]
 
         assert config.timeout_seconds == 30
         assert config.use_ssh_agent is True
 
     def test_init_custom_values(self) -> None:
         """Test GitConfig with custom values."""
-        config = GitConfig(timeout_seconds=45, use_ssh_agent=False)
+        config = GitConfig(timeout_seconds=45, use_ssh_agent=False)  # pyright: ignore[reportCallIssue]
 
         assert config.timeout_seconds == 45
         assert config.use_ssh_agent is False
@@ -280,7 +280,7 @@ class TestGitHubAPIConfig:
 
     def test_init_defaults(self) -> None:
         """Test GitHubAPIConfig with default values."""
-        config = GitHubAPIConfig()
+        config = GitHubAPIConfig()  # pyright: ignore[reportCallIssue]
 
         assert config.base_url == "https://api.github.com"
         assert config.graphql_url == "https://api.github.com/graphql"
@@ -290,24 +290,24 @@ class TestGitHubAPIConfig:
 
     def test_init_with_token(self) -> None:
         """Test GitHubAPIConfig with token."""
-        config = GitHubAPIConfig(token="ghp_test_token")
+        config = GitHubAPIConfig(token="ghp_test_token")  # pyright: ignore[reportCallIssue]
         assert config.token == "ghp_test_token"
 
     def test_effective_token_from_token(self) -> None:
         """Test effective_token property with explicit token."""
-        config = GitHubAPIConfig(token="explicit_token")
+        config = GitHubAPIConfig(token="explicit_token")  # pyright: ignore[reportCallIssue]
         assert config.effective_token == "explicit_token"
 
     def test_effective_token_from_env(self) -> None:
         """Test effective_token property from environment."""
-        config = GitHubAPIConfig()
+        config = GitHubAPIConfig()  # pyright: ignore[reportCallIssue]
 
         with patch.dict("os.environ", {"GITHUB_TOKEN": "env_token"}):
             assert config.effective_token == "env_token"
 
     def test_effective_token_none(self) -> None:
         """Test effective_token property when no token available."""
-        config = GitHubAPIConfig()
+        config = GitHubAPIConfig()  # pyright: ignore[reportCallIssue]
 
         with patch.dict("os.environ", {}, clear=True):
             assert config.effective_token is None
@@ -318,7 +318,7 @@ class TestAPICallStats:
 
     def test_init_defaults(self) -> None:
         """Test APICallStats with default values."""
-        stats = APICallStats()
+        stats = APICallStats()  # pyright: ignore[reportCallIssue]
 
         assert stats.total_calls == 0
         assert stats.graphql_calls == 0
@@ -330,18 +330,18 @@ class TestAPICallStats:
 
     def test_success_rate_property(self) -> None:
         """Test success_rate property calculation."""
-        stats = APICallStats(total_calls=100, failed_calls=10)
+        stats = APICallStats(total_calls=100, failed_calls=10)  # pyright: ignore[reportCallIssue]
 
         assert stats.success_rate == 90.0
 
     def test_success_rate_no_calls(self) -> None:
         """Test success_rate with no calls."""
-        stats = APICallStats()
+        stats = APICallStats()  # pyright: ignore[reportCallIssue]
         assert stats.success_rate == 100.0
 
     def test_cache_hit_rate_property(self) -> None:
         """Test cache_hit_rate property calculation."""
-        stats = APICallStats(total_calls=50, cache_hits=20)
+        stats = APICallStats(total_calls=50, cache_hits=20)  # pyright: ignore[reportCallIssue]
 
         # Cache hit rate should be hits / (total - cache_hits) * 100
         expected_rate = (20 / (50 - 20)) * 100
@@ -349,7 +349,7 @@ class TestAPICallStats:
 
     def test_cache_hit_rate_no_api_calls(self) -> None:
         """Test cache_hit_rate with no API calls."""
-        stats = APICallStats(cache_hits=10)
+        stats = APICallStats(cache_hits=10)  # pyright: ignore[reportCallIssue]
         assert stats.cache_hit_rate == 0.0
 
 
@@ -358,7 +358,7 @@ class TestGitHubRateLimitInfo:
 
     def test_init_defaults(self) -> None:
         """Test GitHubRateLimitInfo with default values."""
-        info = GitHubRateLimitInfo()
+        info = GitHubRateLimitInfo()  # pyright: ignore[reportCallIssue]
 
         assert info.limit == 5000
         assert info.remaining == 5000
@@ -367,13 +367,13 @@ class TestGitHubRateLimitInfo:
 
     def test_percentage_used_property(self) -> None:
         """Test percentage_used property calculation."""
-        info = GitHubRateLimitInfo(limit=5000, used=1000)
+        info = GitHubRateLimitInfo(limit=5000, used=1000)  # pyright: ignore[reportCallIssue]
 
         assert info.percentage_used == 20.0
 
     def test_percentage_used_zero_limit(self) -> None:
         """Test percentage_used with zero limit."""
-        info = GitHubRateLimitInfo(limit=0, used=0)
+        info = GitHubRateLimitInfo(limit=0, used=0)  # pyright: ignore[reportCallIssue]
         assert info.percentage_used == 0.0
 
 
@@ -382,7 +382,7 @@ class TestCacheConfig:
 
     def test_init_defaults(self) -> None:
         """Test CacheConfig with default values."""
-        config = CacheConfig()
+        config = CacheConfig()  # pyright: ignore[reportCallIssue]
 
         assert config.enabled is True
         assert config.cache_file == "validation_cache.json"
@@ -392,7 +392,7 @@ class TestCacheConfig:
 
     def test_cache_file_path_property(self) -> None:
         """Test cache_file_path property."""
-        config = CacheConfig()
+        config = CacheConfig()  # pyright: ignore[reportCallIssue]
 
         path = config.cache_file_path
         assert isinstance(path, Path)
@@ -404,7 +404,7 @@ class TestConfig:
 
     def test_init_defaults(self) -> None:
         """Test Config with default values."""
-        config = Config()
+        config = Config()  # pyright: ignore[reportCallIssue]
 
         assert config.log_level == LogLevel.INFO
         assert config.parallel_workers == os.cpu_count()
@@ -417,18 +417,18 @@ class TestConfig:
 
     def test_validate_parallel_workers_valid(self) -> None:
         """Test parallel workers validation with valid values."""
-        config = Config(parallel_workers=8)
+        config = Config(parallel_workers=8)  # pyright: ignore[reportCallIssue]
         assert config.parallel_workers == 8
 
     def test_validate_parallel_workers_invalid_low(self) -> None:
         """Test parallel workers validation with too low value."""
         with pytest.raises(ValueError, match="at least 1"):
-            Config(parallel_workers=0)
+            Config(parallel_workers=0)  # pyright: ignore[reportCallIssue]
 
     def test_validate_parallel_workers_invalid_high(self) -> None:
         """Test parallel workers validation with too high value."""
         with pytest.raises(ValueError, match="at most 32"):
-            Config(parallel_workers=50)
+            Config(parallel_workers=50)  # pyright: ignore[reportCallIssue]
 
 
 class TestCLIOptions:
@@ -436,7 +436,7 @@ class TestCLIOptions:
 
     def test_init_defaults(self) -> None:
         """Test CLIOptions with default values."""
-        options = CLIOptions()
+        options = CLIOptions()  # pyright: ignore[reportCallIssue]
 
         assert options.path == Path.cwd()
         assert options.config_file is None
@@ -452,7 +452,7 @@ class TestCLIOptions:
         custom_path = Path("/tmp/test")
         config_path = Path("config.yaml")
 
-        options = CLIOptions(
+        options = CLIOptions(  # pyright: ignore[reportCallIssue]
             path=custom_path,
             config_file=config_path,
             verbose=True,

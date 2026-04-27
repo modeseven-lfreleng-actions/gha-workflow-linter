@@ -26,7 +26,7 @@ class TestConfigManager:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.config_manager = ConfigManager()
+        self.config_manager = ConfigManager()  # pyright: ignore[reportUninitializedInstanceVariable]
 
     def test_init(self) -> None:
         """Test ConfigManager initialization."""
@@ -196,13 +196,13 @@ class TestConfigManager:
         """Test config validation with invalid scan extensions."""
         # Pydantic will validate this at model level
         # Empty scan_extensions is actually valid in the model
-        config = Config(scan_extensions=[])
+        config = Config(scan_extensions=[])  # pyright: ignore[reportCallIssue]
         assert config.scan_extensions == []
 
     def test_validate_config_invalid_github_api(self) -> None:
         """Test config validation with invalid GitHub API config."""
         # Test validation through config loading - Pydantic handles this
-        config = Config()
+        config = Config()  # pyright: ignore[reportCallIssue]
         # These values are valid in the model
         assert config.github_api.timeout > 0
         assert config.github_api.max_retries >= 0
@@ -210,7 +210,7 @@ class TestConfigManager:
     def test_validate_config_invalid_cache(self) -> None:
         """Test config validation with invalid cache config."""
         # Test validation through config loading
-        config = Config()
+        config = Config()  # pyright: ignore[reportCallIssue]
         # These values are actually valid in the model, so just verify they work
         assert config.cache.default_ttl_seconds > 0
         assert config.cache.max_cache_size > 0
@@ -343,7 +343,7 @@ cache:
         """Test loading config with environment variable expansion."""
         # Since the model handles environment variables directly,
         # just test that it works
-        config = Config()
+        config = Config()  # pyright: ignore[reportCallIssue]
         # The effective_github_token property handles env vars
         with patch.dict(os.environ, {"GITHUB_TOKEN": "test_token"}):
             assert config.effective_github_token == "test_token"
@@ -387,7 +387,7 @@ cache:
 
     def test_effective_github_token_from_env(self) -> None:
         """Test effective GitHub token from environment variable."""
-        config = Config()
+        config = Config()  # pyright: ignore[reportCallIssue]
         config.github_api.token = None
 
         with patch.dict(os.environ, {"GITHUB_TOKEN": "env_token_456"}):
@@ -395,7 +395,7 @@ cache:
 
     def test_effective_github_token_config_over_env(self) -> None:
         """Test that config token takes precedence over environment."""
-        config = Config()
+        config = Config()  # pyright: ignore[reportCallIssue]
         config.github_api.token = "config_token"
 
         with patch.dict(os.environ, {"GITHUB_TOKEN": "env_token"}):
@@ -403,7 +403,7 @@ cache:
 
     def test_effective_github_token_none(self) -> None:
         """Test effective GitHub token when neither config nor env is set."""
-        config = Config()
+        config = Config()  # pyright: ignore[reportCallIssue]
         config.github_api.token = None
 
         with patch.dict(os.environ, {}, clear=True):

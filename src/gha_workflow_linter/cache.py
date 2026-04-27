@@ -278,8 +278,11 @@ class ValidationCache:
                 parents=True, exist_ok=True
             )
 
-            # Convert cache entries to JSON-serializable format
-            cache_data = {
+            # Convert cache entries to JSON-serializable format. The
+            # mapping is intentionally heterogeneous (mix of metadata
+            # primitives, per-entry model dumps, and nested redirect /
+            # latest-version dicts), so type as Any-valued.
+            cache_data: dict[str, Any] = {
                 "_metadata": {
                     "version": __version__,
                     "created_timestamp": time.time(),

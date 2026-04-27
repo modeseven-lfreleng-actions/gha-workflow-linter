@@ -87,7 +87,7 @@ cache:
         runner = CliRunner()
 
         # First, create some cache entries
-        cache_config = CacheConfig(
+        cache_config = CacheConfig(  # pyright: ignore[reportCallIssue]
             enabled=True, cache_dir=temp_cache_dir, cache_file="test_cache.json"
         )
         cache = ValidationCache(cache_config)
@@ -134,7 +134,7 @@ cache:
         runner = CliRunner()
 
         # Create cache with expired entries
-        cache_config = CacheConfig(
+        cache_config = CacheConfig(  # pyright: ignore[reportCallIssue]
             enabled=True,
             cache_dir=temp_cache_dir,
             cache_file="test_cache.json",
@@ -206,7 +206,7 @@ cache:
     def test_cache_file_operations(self, temp_cache_dir: Path) -> None:
         """Test basic cache file operations."""
         # Create cache with some test data
-        cache_config = CacheConfig(
+        cache_config = CacheConfig(  # pyright: ignore[reportCallIssue]
             enabled=True, cache_dir=temp_cache_dir, cache_file="test_cache.json"
         )
         cache = ValidationCache(cache_config)

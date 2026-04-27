@@ -17,17 +17,17 @@ class TestSkipActionsConfig:
 
     def test_default_skip_actions_false(self) -> None:
         """Test that skip_actions defaults to False."""
-        config = Config()
+        config = Config()  # pyright: ignore[reportCallIssue]
         assert config.skip_actions is False
 
     def test_skip_actions_true(self) -> None:
         """Test setting skip_actions to True."""
-        config = Config(skip_actions=True)
+        config = Config(skip_actions=True)  # pyright: ignore[reportCallIssue]
         assert config.skip_actions is True
 
     def test_skip_actions_false_explicit(self) -> None:
         """Test explicitly setting skip_actions to False."""
-        config = Config(skip_actions=False)
+        config = Config(skip_actions=False)  # pyright: ignore[reportCallIssue]
         assert config.skip_actions is False
 
     def test_skip_actions_in_config_file(self) -> None:
@@ -100,17 +100,17 @@ class TestSkipActionsCLI:
 
     def test_cli_options_default_skip_actions(self) -> None:
         """Test that CLIOptions defaults skip_actions to None (not set)."""
-        cli_options = CLIOptions(path=Path.cwd())
+        cli_options = CLIOptions(path=Path.cwd())  # pyright: ignore[reportCallIssue]
         assert cli_options.skip_actions is None
 
     def test_cli_options_skip_actions_true(self) -> None:
         """Test setting skip_actions to True in CLIOptions."""
-        cli_options = CLIOptions(path=Path.cwd(), skip_actions=True)
+        cli_options = CLIOptions(path=Path.cwd(), skip_actions=True)  # pyright: ignore[reportCallIssue]
         assert cli_options.skip_actions is True
 
     def test_cli_options_skip_actions_false(self) -> None:
         """Test explicitly setting skip_actions to False in CLIOptions."""
-        cli_options = CLIOptions(path=Path.cwd(), skip_actions=False)
+        cli_options = CLIOptions(path=Path.cwd(), skip_actions=False)  # pyright: ignore[reportCallIssue]
         assert cli_options.skip_actions is False
 
 
@@ -159,7 +159,7 @@ runs:
         temp_dir = self.create_test_structure()
 
         try:
-            config = Config(skip_actions=False)
+            config = Config(skip_actions=False)  # pyright: ignore[reportCallIssue]
             scanner = WorkflowScanner(config)
 
             files = list(scanner.find_workflow_files(temp_dir))
@@ -182,7 +182,7 @@ runs:
         temp_dir = self.create_test_structure()
 
         try:
-            config = Config(skip_actions=True)
+            config = Config(skip_actions=True)  # pyright: ignore[reportCallIssue]
             scanner = WorkflowScanner(config)
 
             files = list(scanner.find_workflow_files(temp_dir))
@@ -202,7 +202,7 @@ runs:
         temp_dir = self.create_test_structure()
 
         try:
-            config = Config(skip_actions=False)
+            config = Config(skip_actions=False)  # pyright: ignore[reportCallIssue]
             scanner = WorkflowScanner(config)
 
             results = scanner.scan_directory(temp_dir)
@@ -225,7 +225,7 @@ runs:
         temp_dir = self.create_test_structure()
 
         try:
-            config = Config(skip_actions=True)
+            config = Config(skip_actions=True)  # pyright: ignore[reportCallIssue]
             scanner = WorkflowScanner(config)
 
             results = scanner.scan_directory(temp_dir)
@@ -258,7 +258,7 @@ runs:
         (temp_dir / "action.yml").write_text(action_content)
 
         try:
-            config = Config(skip_actions=True)
+            config = Config(skip_actions=True)  # pyright: ignore[reportCallIssue]
             scanner = WorkflowScanner(config)
 
             files = list(scanner.find_workflow_files(temp_dir))
@@ -287,7 +287,7 @@ runs:
         (temp_dir / "action.yml").write_text(action_content)
 
         try:
-            config = Config(skip_actions=False)
+            config = Config(skip_actions=False)  # pyright: ignore[reportCallIssue]
             scanner = WorkflowScanner(config)
 
             files = list(scanner.find_workflow_files(temp_dir))
@@ -311,7 +311,7 @@ class TestSkipActionsLogging:
 
         from gha_workflow_linter.scanner import WorkflowScanner
 
-        config = Config(skip_actions=False)
+        config = Config(skip_actions=False)  # pyright: ignore[reportCallIssue]
         scanner = WorkflowScanner(config)
 
         # Mock the logger
@@ -352,7 +352,7 @@ runs:
         (temp_dir / "action.yml").write_text(action_content)
 
         try:
-            config = Config(skip_actions=False)
+            config = Config(skip_actions=False)  # pyright: ignore[reportCallIssue]
             scanner = WorkflowScanner(config)
 
             # Mock the logger

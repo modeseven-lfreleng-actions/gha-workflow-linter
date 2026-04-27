@@ -155,7 +155,7 @@ class TestCLICommands:
 
     def setup_method(self) -> None:
         """Set up test fragments."""
-        self.runner = CliRunner()
+        self.runner = CliRunner()  # pyright: ignore[reportUninitializedInstanceVariable]
 
     def test_main_help(self) -> None:
         """Test main app help."""

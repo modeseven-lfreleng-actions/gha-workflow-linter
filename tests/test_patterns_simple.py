@@ -14,7 +14,7 @@ class TestActionCallPatterns:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.patterns = ActionCallPatterns()
+        self.patterns = ActionCallPatterns()  # pyright: ignore[reportUninitializedInstanceVariable]
 
     def test_init(self) -> None:
         """Test ActionCallPatterns initialization."""

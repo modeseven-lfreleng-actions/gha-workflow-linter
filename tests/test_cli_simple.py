@@ -92,7 +92,7 @@ class TestCLIIntegration:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.runner = CliRunner()
+        self.runner = CliRunner()  # pyright: ignore[reportUninitializedInstanceVariable]
 
     def test_app_help(self) -> None:
         """Test main app help command."""
@@ -108,7 +108,7 @@ class TestCLIIntegration:
         self, mock_cache_class: Mock, mock_config_manager: Mock
     ) -> None:
         """Test cache info command."""
-        mock_config_manager.return_value.load_config.return_value = Config(
+        mock_config_manager.return_value.load_config.return_value = Config(  # pyright: ignore[reportCallIssue]
             log_level=LogLevel.INFO, parallel_workers=4, require_pinned_sha=True
         )
 
@@ -141,7 +141,7 @@ class TestCLIIntegration:
         self, mock_cache_class: Mock, mock_config_manager: Mock
     ) -> None:
         """Test cache purge command."""
-        mock_config_manager.return_value.load_config.return_value = Config(
+        mock_config_manager.return_value.load_config.return_value = Config(  # pyright: ignore[reportCallIssue]
             log_level=LogLevel.INFO, parallel_workers=4, require_pinned_sha=True
         )
 
@@ -160,7 +160,7 @@ class TestCLIIntegration:
         self, mock_cache_class: Mock, mock_config_manager: Mock
     ) -> None:
         """Test cache cleanup command."""
-        mock_config_manager.return_value.load_config.return_value = Config(
+        mock_config_manager.return_value.load_config.return_value = Config(  # pyright: ignore[reportCallIssue]
             log_level=LogLevel.INFO, parallel_workers=4, require_pinned_sha=True
         )
 
@@ -179,7 +179,7 @@ class TestCLIIntegration:
         self, mock_cache_class: Mock, mock_config_manager: Mock
     ) -> None:
         """Test cache command with no options."""
-        mock_config_manager.return_value.load_config.return_value = Config(
+        mock_config_manager.return_value.load_config.return_value = Config(  # pyright: ignore[reportCallIssue]
             log_level=LogLevel.INFO, parallel_workers=4, require_pinned_sha=True
         )
 

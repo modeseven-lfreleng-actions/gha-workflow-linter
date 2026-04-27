@@ -33,7 +33,7 @@ class TestMismatchedShaFix:
     @pytest.fixture
     def config(self) -> Config:
         """Create a test config with auto_fix enabled but auto_latest disabled."""
-        return Config(
+        return Config(  # pyright: ignore[reportCallIssue]
             log_level=LogLevel.DEBUG,
             parallel_workers=2,
             require_pinned_sha=True,
@@ -43,8 +43,8 @@ class TestMismatchedShaFix:
             skip_actions=False,
             fix_test_calls=False,
             validation_method=ValidationMethod.GITHUB_API,
-            cache=CacheConfig(enabled=False),
-            github_api=GitHubAPIConfig(token="test-token"),
+            cache=CacheConfig(enabled=False),  # pyright: ignore[reportCallIssue]
+            github_api=GitHubAPIConfig(token="test-token"),  # pyright: ignore[reportCallIssue]
         )
 
     @pytest.mark.asyncio
@@ -66,7 +66,7 @@ jobs:
         workflow_file.write_text(workflow_content)
 
         # Create action call representing the invalid SHA
-        action_call = ActionCall(
+        action_call = ActionCall(  # pyright: ignore[reportCallIssue]
             organization="release-drafter",
             repository="release-drafter",
             reference="0000000000000000000000000000000000000000",
@@ -160,7 +160,7 @@ jobs:
 
         # Create action call with valid SHA but wrong version comment
         # The SHA 267d2e... is actually for v6.1.1, but comment says v6.1.0
-        action_call = ActionCall(
+        action_call = ActionCall(  # pyright: ignore[reportCallIssue]
             organization="release-drafter",
             repository="release-drafter",
             reference="267d2e0268deae5d44f3ba5029dd4d6e85f9d52d",  # This is v6.1.1's SHA
@@ -252,7 +252,7 @@ jobs:
         workflow_file.write_text(workflow_content)
 
         # Create action call with valid SHA but wrong version comment
-        action_call = ActionCall(
+        action_call = ActionCall(  # pyright: ignore[reportCallIssue]
             organization="release-drafter",
             repository="release-drafter",
             reference="267d2e0268deae5d44f3ba5029dd4d6e85f9d52d",  # This is v6.1.1's SHA
@@ -341,7 +341,7 @@ jobs:
         workflow_file = tmp_path / "test.yaml"
         workflow_file.write_text(workflow_content)
 
-        action_call = ActionCall(
+        action_call = ActionCall(  # pyright: ignore[reportCallIssue]
             organization="release-drafter",
             repository="release-drafter",
             reference="0000000000000000000000000000000000000000",
@@ -420,7 +420,7 @@ class TestInvalidReferenceWithCommentVersion:
     @pytest.fixture
     def config(self) -> Config:
         """Create a test config."""
-        return Config(
+        return Config(  # pyright: ignore[reportCallIssue]
             log_level=LogLevel.DEBUG,
             parallel_workers=2,
             require_pinned_sha=True,
@@ -430,8 +430,8 @@ class TestInvalidReferenceWithCommentVersion:
             skip_actions=False,
             fix_test_calls=False,
             validation_method=ValidationMethod.GITHUB_API,
-            cache=CacheConfig(enabled=False),
-            github_api=GitHubAPIConfig(token="test-token"),
+            cache=CacheConfig(enabled=False),  # pyright: ignore[reportCallIssue]
+            github_api=GitHubAPIConfig(token="test-token"),  # pyright: ignore[reportCallIssue]
         )
 
     @pytest.mark.asyncio
@@ -451,7 +451,7 @@ jobs:
         workflow_file = tmp_path / "test.yaml"
         workflow_file.write_text(workflow_content)
 
-        action_call = ActionCall(
+        action_call = ActionCall(  # pyright: ignore[reportCallIssue]
             organization="release-drafter",
             repository="release-drafter",
             reference="invalid_sha_here",
@@ -545,7 +545,7 @@ jobs:
         workflow_file = tmp_path / "test.yaml"
         workflow_file.write_text(workflow_content)
 
-        action_call = ActionCall(
+        action_call = ActionCall(  # pyright: ignore[reportCallIssue]
             organization="release-drafter",
             repository="release-drafter",
             reference="invalid_sha_here",
@@ -632,7 +632,7 @@ jobs:
         workflow_file = tmp_path / "test.yaml"
         workflow_file.write_text(workflow_content)
 
-        action_call = ActionCall(
+        action_call = ActionCall(  # pyright: ignore[reportCallIssue]
             organization="release-drafter",
             repository="release-drafter",
             reference="invalid_sha_here",
