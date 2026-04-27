@@ -266,7 +266,14 @@ class ValidationCache:
                         "Legacy cache format detected (no version info). "
                         "Purging cache for consistency."
                     )
+                # The redirects and latest_versions dicts may have been
+                # partly populated above from the incompatible cache file
+                # before the version check ran; clear them along with
+                # _cache so no stale data leaks into the run.
                 self._version_mismatch_purged = True
+                self._cache.clear()
+                self._redirects.clear()
+                self._latest_versions.clear()
                 self._purge_cache_file()
                 self._loaded = True
                 return
@@ -307,9 +314,12 @@ class ValidationCache:
 
         1. ``_load_cache()`` — deserializes the cache file and records a
            version-mismatch purge if applicable.
-        2. ``auto_purge_if_suspicious()`` — runs cheap heuristics over
-           the loaded entries and purges if anomalies (high error rate,
-           etc.) are detected.
+        2. ``detect_suspicious_cache_patterns()`` over the loaded
+           entries followed by ``purge()`` if anomalies (high error
+           rate, etc.) are detected. We inline these calls (rather than
+           delegating to ``auto_purge_if_suspicious()``) so the report
+           can surface the specific ``reasons`` that triggered the
+           purge.
 
         The method is UI-free; it returns a ``CachePrimeReport`` describing
         what happened so the caller can render banners *before* any Rich

@@ -292,6 +292,57 @@ class TestCachePrime:
         assert report.version_mismatch_purged is True
         assert report.suspicious_patterns_purged is False
 
+    def test_prime_clears_inmemory_state_on_version_mismatch(self) -> None:
+        """A version-mismatch purge must clear in-memory _cache,
+        _redirects and _latest_versions populated from the stale
+        on-disk file, otherwise stale entries leak into the run.
+        """
+        import json
+
+        stale = {
+            "_metadata": {
+                "version": "0.0.0-stale",
+                "created_timestamp": time.time(),
+                "entry_count": 0,
+                "redirect_count": 1,
+                "latest_version_count": 1,
+            },
+            "owner/repo@v1": {
+                "repository": "owner/repo",
+                "reference": "v1",
+                "result": "valid",
+                "validation_method_used": "graphql",
+                "validation_method": "github-api",
+                "timestamp": time.time(),
+                "error_message": None,
+            },
+            "redirects": {
+                "old/repo": {
+                    "old_repository": "old/repo",
+                    "new_repository": "new/repo",
+                    "timestamp": time.time(),
+                }
+            },
+            "latest_versions": {
+                "owner/repo": {
+                    "repository": "owner/repo",
+                    "tag": "v1",
+                    "sha": "0" * 40,
+                    "timestamp": time.time(),
+                }
+            },
+        }
+        cache_path = self._temp_cache_dir / "cache.json"
+        cache_path.write_text(json.dumps(stale))
+
+        cache = ValidationCache(self.cache_config)
+        report = cache.prime()
+        assert report.version_mismatch_purged is True
+        # All in-memory state should be empty after a mismatch purge.
+        assert cache._cache == {}
+        assert cache._redirects == {}
+        assert cache._latest_versions == {}
+
     def test_prime_does_not_print(
         self, capsys: pytest.CaptureFixture[str]
     ) -> None:
