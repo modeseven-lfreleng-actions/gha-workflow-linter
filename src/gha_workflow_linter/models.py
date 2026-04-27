@@ -397,9 +397,10 @@ class Config(BaseModel):
         description="Enable action call fixes with test-related keywords in comments (e.g., test, testing)",
     )
 
-    # pydantic BaseModel subclasses with all-defaulted fields accept no
-    # arguments at runtime, but basedpyright reports reportCallIssue for
-    # them. Suppress that one diagnostic on the factory references.
+    # pydantic BaseModel subclasses with all-defaulted fields require no
+    # arguments (keyword args are still accepted), but basedpyright reports
+    # reportArgumentType when such classes are used as Field default_factory
+    # values. Suppress that one diagnostic on the factory references.
     network: NetworkConfig = Field(
         default_factory=NetworkConfig,  # pyright: ignore[reportArgumentType]
         description="Network configuration",

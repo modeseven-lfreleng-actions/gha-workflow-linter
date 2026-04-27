@@ -45,9 +45,10 @@ class GitHubGraphQLClient:
         self.config = config
         self.logger = logging.getLogger(__name__)
         self._http_client: httpx.AsyncClient | None = None
-        # pydantic BaseModel subclasses with all-defaulted fields accept
-        # no constructor args at runtime, but basedpyright reports them
-        # as missing. Suppress that one diagnostic on the calls below.
+        # pydantic BaseModel subclasses with all-defaulted fields require
+        # no constructor args (keyword args are still accepted), but
+        # basedpyright reports the no-arg call as missing parameters.
+        # Suppress that one diagnostic on the calls below.
         self._rate_limit_info = GitHubRateLimitInfo()  # pyright: ignore[reportCallIssue]
         self.api_stats = APICallStats()  # pyright: ignore[reportCallIssue]
 
@@ -517,7 +518,9 @@ class GitHubGraphQLClient:
         tag_queries = []
 
         for idx, ref in enumerate(refs):
-            # Sanitize ref for use as GraphQL alias (remove special chars)
+            # Use the loop index to generate a stable GraphQL-safe alias.
+            # The ref itself appears only inside the qualifiedName string,
+            # never in the alias, so no ref sanitization is needed here.
             alias = f"ref_{idx}"
             branch_queries.append(
                 f'{alias}: ref(qualifiedName: "refs/heads/{ref}") {{ name }}'

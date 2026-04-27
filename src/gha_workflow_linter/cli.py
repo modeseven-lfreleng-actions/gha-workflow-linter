@@ -151,38 +151,47 @@ def _preprocess_args_for_default_command(
         if arg in ("--help", "--version"):
             return args
 
-    # Check if first non-option argument is a known command
-    for i, arg in enumerate(args):
-        # Skip options and their values
+    # Options that consume the following token as their value. Long-form
+    # variants like ``--config=foo.yml`` carry their value in the same
+    # token and don't need special handling.
+    value_taking_options = {
+        "--config",
+        "-c",
+        "--github-token",
+        "--workers",
+        "-j",
+        "--exclude",
+        "-e",
+        "--cache-ttl",
+        "--validation-method",
+        "--log-level",
+        "--format",
+        "-f",
+        "--files",
+    }
+
+    # Walk the argv with an explicit index so we can advance past the
+    # value token of value-taking options instead of treating it as the
+    # first positional argument.
+    i = 0
+    while i < len(args):
+        arg = args[i]
+
         if arg.startswith("-"):
-            # Check if this is a flag that takes a value
-            if arg in (
-                "--config",
-                "-c",
-                "--github-token",
-                "--workers",
-                "-j",
-                "--exclude",
-                "-e",
-                "--cache-ttl",
-                "--validation-method",
-                "--log-level",
-                "--format",
-                "-f",
-                "--files",
-            ):
-                # Skip the next argument (the value) if it exists
+            # Bare value-taking option: also consume the next token (its
+            # value) so it doesn't get misclassified as positional.
+            if arg in value_taking_options and i + 1 < len(args):
+                i += 2
                 continue
+            i += 1
             continue
 
-        # Found a non-option argument
+        # First non-option token: either an existing subcommand, or a
+        # positional that we need to prepend ``lint`` in front of.
         if arg in known_commands:
-            # Already has a subcommand
             return args
-        else:
-            # No subcommand found, inject 'lint' before this argument
-            args.insert(i, "lint")
-            return args
+        args.insert(i, "lint")
+        return args
 
     # No positional arguments found, add 'lint' at the end
     args.append("lint")

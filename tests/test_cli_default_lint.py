@@ -19,6 +19,8 @@ from gha_workflow_linter.models import ValidationMethod
 class TestCLIDefaultLint:
     """Test that CLI invokes lint by default when no subcommand is provided."""
 
+    runner: CliRunner  # pyright: ignore[reportUninitializedInstanceVariable]
+
     def setup_method(self) -> None:
         """Set up test fixtures."""
         self.runner = CliRunner()
@@ -547,3 +549,77 @@ class TestCLIDefaultLint:
             # Should run successfully
             assert result.exit_code == 0
             assert "No workflows found to validate" in result.stdout
+
+
+class TestPreprocessArgsForDefaultCommand:
+    """Unit tests for _preprocess_args_for_default_command argv rewriting."""
+
+    def test_no_args_appends_lint(self) -> None:
+        assert _preprocess_args_for_default_command([]) == ["lint"]
+
+    def test_help_passes_through(self) -> None:
+        assert _preprocess_args_for_default_command(["--help"]) == ["--help"]
+        assert _preprocess_args_for_default_command(["--version"]) == [
+            "--version"
+        ]
+
+    def test_known_subcommand_passes_through(self) -> None:
+        assert _preprocess_args_for_default_command(["lint", "foo"]) == [
+            "lint",
+            "foo",
+        ]
+        assert _preprocess_args_for_default_command(["cache", "--purge"]) == [
+            "cache",
+            "--purge",
+        ]
+
+    def test_positional_path_gets_lint_injected(self) -> None:
+        assert _preprocess_args_for_default_command(["src/"]) == [
+            "lint",
+            "src/",
+        ]
+
+    def test_value_taking_option_before_path(self) -> None:
+        """Regression test: --config foo.yml path/ must not have 'lint'
+        injected between --config and its value."""
+        result = _preprocess_args_for_default_command(
+            ["--config", "foo.yml", "src/"]
+        )
+        assert result == ["--config", "foo.yml", "lint", "src/"]
+
+    def test_multiple_value_taking_options(self) -> None:
+        result = _preprocess_args_for_default_command(
+            [
+                "--config",
+                "foo.yml",
+                "--workers",
+                "4",
+                "--exclude",
+                "*.test.yml",
+                "src/",
+            ]
+        )
+        assert result == [
+            "--config",
+            "foo.yml",
+            "--workers",
+            "4",
+            "--exclude",
+            "*.test.yml",
+            "lint",
+            "src/",
+        ]
+
+    def test_value_taking_option_with_no_path(self) -> None:
+        """When only flags are given, lint is appended at the end."""
+        result = _preprocess_args_for_default_command(["--config", "foo.yml"])
+        assert result == ["--config", "foo.yml", "lint"]
+
+    def test_short_value_taking_option(self) -> None:
+        result = _preprocess_args_for_default_command(["-c", "foo.yml", "src/"])
+        assert result == ["-c", "foo.yml", "lint", "src/"]
+
+    def test_boolean_flag_does_not_consume_next_token(self) -> None:
+        """--verbose is a bare flag; the following token is positional."""
+        result = _preprocess_args_for_default_command(["--verbose", "src/"])
+        assert result == ["--verbose", "lint", "src/"]
