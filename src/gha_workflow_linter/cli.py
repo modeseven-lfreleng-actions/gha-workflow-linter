@@ -106,7 +106,7 @@ console = Console()
 def _print_version() -> None:
     """Print version string with consistent formatting."""
     # Two spaces fixes rendering issues in terminal applications
-    console.print(f"🏷️  gha-workflow-linter version {__version__}")
+    console.print(f"gha-workflow-linter version {__version__} 🏷️")
 
 
 def version_callback(value: bool) -> None:
@@ -599,19 +599,19 @@ def lint(
                 config.validation_method = ValidationMethod.GIT
                 if not quiet:
                     console.print(
-                        "[yellow]ℹ️ No GitHub token available, using Git validation method[/yellow]"
+                        "[yellow]No GitHub token available, using Git validation method ℹ️[/yellow]"
                     )
 
         # Display validation method being used (suppress for JSON output)
         if not quiet and output_format != "json":
             if config.validation_method == ValidationMethod.GITHUB_API:
-                console.print("[blue]🔍 Using validation method: [GraphQL][/blue]")
+                console.print("[blue]Using validation method: [GraphQL] 🔍[/blue]")
             else:
-                console.print("[blue]🔍 Using validation method: [Git/SSH][/blue]")
+                console.print("[blue]Using validation method: [Git/SSH] 🔍[/blue]")
 
             # Display number of parallel workers
             worker_source = "auto-detected" if workers is None else "configured"
-            console.print(f"[blue]⚙️  Using {config.parallel_workers} parallel worker(s) ({worker_source})[/blue]")
+            console.print(f"[blue]Using {config.parallel_workers} parallel worker(s) ({worker_source}) ⚙️[/blue]")
 
         # Only check rate limits if using GitHub API
         if config.validation_method == ValidationMethod.GITHUB_API:
@@ -624,7 +624,7 @@ def lint(
                 # If we get here, we're not rate limited
                 if not effective_token and not quiet:
                     logger.warning(
-                        "⚠️ No GitHub token available; API requests may be rate-limited"
+                        "No GitHub token available; API requests may be rate-limited ⚠️"
                     )
             except SystemExit:
                 # Rate limit check triggered exit, re-raise to exit cleanly
@@ -696,13 +696,13 @@ def cache(
 
     if purge:
         removed_count = cache_instance.purge()
-        console.print(f"[green]✅ Purged {removed_count} cache entries[/green]")
+        console.print(f"[green]Purged {removed_count} cache entries ✅[/green]")
         return
 
     if cleanup:
         removed_count = cache_instance.cleanup()
         console.print(
-            f"[green]✅ Removed {removed_count} expired cache entries[/green]"
+            f"[green]Removed {removed_count} expired cache entries ✅[/green]"
         )
         return
 
@@ -930,7 +930,7 @@ def run_linter(config: Config, options: CLIOptions) -> int:
                 if files_with_skipped:
                     console.print(f"\n[cyan]⏩ Skipped {sum(len(v) for v in files_with_skipped.values())} testing action(s) in {len(files_with_skipped)} file(s):[/cyan]")
                     for file_path, changes in files_with_skipped.items():
-                        console.print(f"\n[bold]📄 {_get_relative_path(file_path, options.path)}[/bold]")
+                        console.print(f"\n[bold]{_get_relative_path(file_path, options.path)} 📄[/bold]")
                         for change in changes:
                             # Extract just the uses: part from the raw line
                             line = change["old_line"].strip()
@@ -942,9 +942,9 @@ def run_linter(config: Config, options: CLIOptions) -> int:
                 # Display actual fixes
                 if files_with_fixes:
                     total_workflow_calls_updated = sum(len(changes) for changes in files_with_fixes.values())
-                    console.print(f"\n[yellow]🔧 Updated {total_workflow_calls_updated} workflow call(s) in {len(files_with_fixes)} file(s):[/yellow]")
+                    console.print(f"\n[yellow]Updated {total_workflow_calls_updated} workflow call(s) in {len(files_with_fixes)} file(s): 🔧[/yellow]")
                     for file_path, changes in files_with_fixes.items():
-                        console.print(f"\n[bold]📄 {_get_relative_path(file_path, options.path)}[/bold]")
+                        console.print(f"\n[bold]{_get_relative_path(file_path, options.path)} 📄[/bold]")
                         for change in changes:
                             console.print(f"[red]  - {change['old_line'].strip()}[/red]")
                             console.print(f"[green]  + {change['new_line'].strip()}[/green]")
@@ -955,7 +955,7 @@ def run_linter(config: Config, options: CLIOptions) -> int:
         except Exception as e:
             logger.warning(f"Auto-fix failed: {e}")
             if not options.quiet:
-                console.print(f"[yellow]⚠️ Auto-fix failed: {e}[/yellow]")
+                console.print(f"[yellow]Auto-fix failed: {e} ⚠️[/yellow]")
 
     # Generate and display results
     scan_summary = scanner.get_scan_summary(workflow_calls)
@@ -1114,13 +1114,13 @@ def _display_validation_summary(validation_summary: dict[str, Any], skip_success
 
     if actual_errors == 0 and test_refs == 0:
         if not skip_success:
-            console.print("[green]✅ All action calls are valid![/green]")
+            console.print("[green]All action calls are valid! ✅[/green]")
         return
 
     # Show actual errors
     if actual_errors > 0:
         console.print(
-            f"[red]❌ Found {actual_errors} validation errors[/red]"
+            f"[red]Found {actual_errors} validation errors ❌[/red]"
         )
 
         if validation_summary["invalid_repositories"] > 0:
@@ -1147,7 +1147,7 @@ def _display_validation_summary(validation_summary: dict[str, Any], skip_success
         if actual_errors > 0:
             console.print()  # Add spacing between errors and warnings
         console.print(
-            f"[yellow]⚠️  Found {test_refs} test action references[/yellow]"
+            f"[yellow]Found {test_refs} test action references ⚠️[/yellow]"
         )
 
     # Show deduplication and API efficiency
@@ -1186,7 +1186,7 @@ def _display_stale_actions_from_summary(
     console = Console()
 
     if not stale_actions:
-        console.print("[green]✅ All action calls are up to date![/green]\n")
+        console.print("[green]All action calls are up to date! ✅[/green]\n")
         return
 
     # Count incorrect (invalid) and outdated actions separately
@@ -1213,7 +1213,7 @@ def _display_stale_actions_from_summary(
     console.print()
 
     for file_path in sorted(stale_actions.keys()):
-        console.print(f"[bold]📄 {file_path}[/bold]")
+        console.print(f"[bold]{file_path} 📄[/bold]")
         for action_info in stale_actions[file_path]:
             current_display = action_info["current_ref"][:12] + "..." if len(action_info["current_ref"]) > 40 else action_info["current_ref"]
             latest_display = action_info["latest_ref"][:12] + "..." if len(action_info["latest_ref"]) > 40 else action_info["latest_ref"]
@@ -1246,7 +1246,7 @@ def _display_stale_actions_from_summary(
                 console.print(f"    [green]Latest:[/green]   @{latest_display} [dim]# {action_info['latest_version']}[/dim]")
         console.print()
 
-    console.print("[cyan]💡 Run with [bold]--auto-fix --auto-latest[/bold] to update these actions[/cyan]\n")
+    console.print("[cyan]Run with [bold]--auto-fix --auto-latest[/bold] to update these actions 💡[/cyan]\n")
 
 
 def output_text_results(
@@ -1310,7 +1310,7 @@ def output_text_results(
 
         # Display modification message after scan summary if files were modified
         if has_actual_fixes:
-            console.print("\n[yellow]⚠️ Files have been modified; please review the changes and commit them.[/yellow]")
+            console.print("\n[yellow]Files have been modified; please review the changes and commit them ⚠️[/yellow]")
 
     # Separate errors by type
     if errors:
@@ -1342,7 +1342,7 @@ def output_text_results(
         if actual_errors:
             console.print("\n[red]Validation Errors:[/red]")
             for file_path in sorted(actual_errors.keys()):
-                console.print(f"❌ Invalid action call in workflow: [bold]{file_path}[/bold]")
+                console.print(f"Invalid action call in workflow: [bold]{file_path}[/bold] ❌")
                 for error_info in actual_errors[file_path]:
                     console.print(f"   {error_info['action_ref']} [dim][line {error_info['line']}][/dim]")
 
@@ -1351,7 +1351,7 @@ def output_text_results(
             console.print("\n[yellow]Test Action Calls:[/yellow]")
             for file_path in sorted(test_warnings.keys()):
                 # Two spaces is deliberate; fixes rendering in terminal output
-                console.print(f"⚠️  Test action calls in workflow: [bold]{file_path}[/bold]")
+                console.print(f"Test action calls in workflow: [bold]{file_path}[/bold] ⚠️")
                 for warning_info in test_warnings[file_path]:
                     console.print(f"   {warning_info['action_ref']} [dim][line {warning_info['line']}][/dim]")
 

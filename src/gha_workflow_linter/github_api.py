@@ -811,7 +811,7 @@ class GitHubGraphQLClient:
 
                     # Check if we're rate limited and exit if so
                     if self._is_rate_limited():
-                        self.logger.warning("⚠️ GitHub API Rate-limited; Skipping Checks")
+                        self.logger.warning("GitHub API Rate-limited; Skipping Checks ⚠️")
                         sys.exit(0)
 
         except Exception as e:

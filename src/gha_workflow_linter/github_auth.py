@@ -55,7 +55,7 @@ def get_github_token_with_fallback(
     # Step 3: Try GitHub CLI fallback
     if not quiet and console:
         console.print(
-            "⚠️  No GitHub token found; attempting to obtain using GitHub CLI"
+            "No GitHub token found; attempting to obtain using GitHub CLI ⚠️"
         )
 
     try:
@@ -63,7 +63,7 @@ def get_github_token_with_fallback(
         if cli_token:
             if not quiet and console:
                 console.print(
-                    "✅ Successfully obtained GitHub token from GitHub CLI"
+                    "Successfully obtained GitHub token from GitHub CLI ✅"
                 )
             logger.debug("Successfully obtained GitHub token from GitHub CLI")
             return cli_token
@@ -72,7 +72,7 @@ def get_github_token_with_fallback(
 
     # All methods failed
     if not quiet and console:
-        console.print("❌ Unable to obtain GitHub token from any source")
+        console.print("Unable to obtain GitHub token from any source ❌")
 
     return None
 

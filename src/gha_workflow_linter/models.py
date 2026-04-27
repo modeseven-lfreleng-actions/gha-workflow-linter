@@ -131,7 +131,7 @@ class ValidationError(BaseModel):
     def __str__(self) -> str:
         """String representation of the validation error."""
         return (
-            f"❌ Invalid action call in workflow: {self.file_path}\n"
+            f"Invalid action call in workflow: {self.file_path} ❌\n"
             f"line {self.action_call.line_number}: {self.action_call.raw_line.strip()} [{self.result.value}]"
         )
 
