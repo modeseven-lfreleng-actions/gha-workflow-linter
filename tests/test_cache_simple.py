@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+import shutil
 import tempfile
 import time
 
@@ -92,20 +93,29 @@ class TestValidationCache:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        # Use a temporary file to avoid interference with real cache
-        self.temp_cache_file_path = tempfile.mktemp(suffix=".json")  # pyright: ignore[reportUninitializedInstanceVariable]
+        # Create a private temp directory and place the cache file inside
+        # it. Using mkdtemp() + a fixed filename avoids the race conditions
+        # tempfile.mktemp() exposes (where another process could create the
+        # named path between mktemp() and our first write).
+        self._temp_cache_dir = Path(  # pyright: ignore[reportUninitializedInstanceVariable]
+            tempfile.mkdtemp(prefix="gha-workflow-linter-cache-")
+        )
+        self.temp_cache_file_path = str(  # pyright: ignore[reportUninitializedInstanceVariable]
+            self._temp_cache_dir / "cache.json"
+        )
 
         self.cache_config = CacheConfig(  # pyright: ignore[reportUninitializedInstanceVariable, reportCallIssue]
             enabled=True,
-            cache_dir=Path(self.temp_cache_file_path).parent,
-            cache_file=Path(self.temp_cache_file_path).name,
+            cache_dir=self._temp_cache_dir,
+            cache_file="cache.json",
         )
 
     def teardown_method(self) -> None:
         """Clean up test fixtures."""
-        # Clean up the temporary cache file
-        if os.path.exists(self.temp_cache_file_path):
-            os.unlink(self.temp_cache_file_path)
+        # Remove the entire temp directory in one shot. shutil.rmtree
+        # tolerates a missing directory via ignore_errors=True so tests
+        # that delete the cache file mid-run still teardown cleanly.
+        shutil.rmtree(self._temp_cache_dir, ignore_errors=True)
 
     def test_init_with_config(self) -> None:
         """Test ValidationCache initialization."""
