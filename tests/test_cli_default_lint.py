@@ -659,6 +659,41 @@ class TestPreprocessArgsForDefaultCommand:
         result = _preprocess_args_for_default_command(["lint", "--help"])
         assert result == ["lint", "--help"]
 
+    def test_subcommand_token_as_option_value_is_not_subcommand(
+        self,
+    ) -> None:
+        """Regression: ``--config lint src/`` must inject ``lint`` —
+        ``lint`` here is the *value* of ``--config``, not a subcommand
+        invocation. Detection must look at the first non-option
+        positional token, not scan the whole argv."""
+        result = _preprocess_args_for_default_command(
+            ["--config", "lint", "src/"]
+        )
+        assert result == ["lint", "--config", "lint", "src/"]
+
+    def test_subcommand_token_as_exclude_value_is_not_subcommand(
+        self,
+    ) -> None:
+        """Same regression for the ``cache`` token appearing as the
+        value of ``--exclude``."""
+        result = _preprocess_args_for_default_command(
+            ["--exclude", "cache", "src/"]
+        )
+        assert result == ["lint", "--exclude", "cache", "src/"]
+
+    def test_long_form_option_with_equals_value_does_not_consume_next(
+        self,
+    ) -> None:
+        """``--workers=8`` carries its value in the same token, so the
+        next token is the first positional. ``--config=lint`` is a more
+        adversarial variant of the same shape."""
+        assert _preprocess_args_for_default_command(
+            ["--workers=8", "src/"]
+        ) == ["lint", "--workers=8", "src/"]
+        assert _preprocess_args_for_default_command(
+            ["--config=lint", "src/"]
+        ) == ["lint", "--config=lint", "src/"]
+
     def test_subcommand_option_before_positional_routes_correctly(
         self,
     ) -> None:

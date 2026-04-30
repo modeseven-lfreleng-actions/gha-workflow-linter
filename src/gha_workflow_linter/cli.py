@@ -171,6 +171,27 @@ def _preprocess_args_for_default_command(
     # Known subcommands
     known_commands = {"lint", "cache"}
 
+    # Options that consume the following token as their value when used
+    # in the bare (non ``--name=value``) form. Only used to skip past
+    # an option's value when scanning for the first positional; we no
+    # longer need to insert ``lint`` between option pairs because we
+    # always prepend.
+    value_taking_options = {
+        "--config",
+        "-c",
+        "--github-token",
+        "--workers",
+        "-j",
+        "--exclude",
+        "-e",
+        "--cache-ttl",
+        "--validation-method",
+        "--log-level",
+        "--format",
+        "-f",
+        "--files",
+    }
+
     # No args at all: behave like the explicit `lint` subcommand.
     if not args:
         args.append("lint")
@@ -186,10 +207,34 @@ def _preprocess_args_for_default_command(
     if has_eager and not has_other_tokens:
         return args
 
-    # If a known subcommand is already present anywhere in argv, don't
-    # touch it; the user invoked it explicitly and Typer will route the
-    # surrounding options/arguments to that subcommand correctly.
-    if any(a in known_commands for a in args):
+    # Detect whether the *first non-option positional token* is a known
+    # subcommand. Restricting detection to that position (rather than
+    # scanning the entire argv) avoids mis-classifying values of
+    # value-taking options — e.g. ``--config lint`` should not be
+    # treated as 'subcommand already present', because ``lint`` there
+    # is the *value* of ``--config``, not a command.
+    i = 0
+    first_positional: str | None = None
+    while i < len(args):
+        arg = args[i]
+        if arg.startswith("-"):
+            # ``--name=value`` carries its value in the same token, so
+            # advance by 1; bare value-taking options consume the next
+            # token as the value, so advance by 2.
+            if (
+                "=" not in arg
+                and arg in value_taking_options
+                and i + 1 < len(args)
+            ):
+                i += 2
+            else:
+                i += 1
+            continue
+        first_positional = arg
+        break
+
+    if first_positional is not None and first_positional in known_commands:
+        # The user explicitly invoked a subcommand; leave argv untouched.
         return args
 
     # Otherwise the user is in "default lint" mode. Prepend ``lint`` so
