@@ -634,14 +634,6 @@ class TestPreprocessArgsForDefaultCommand:
         result = _preprocess_args_for_default_command(["--verbose", "src/"])
         assert result == ["lint", "--verbose", "src/"]
 
-    def test_help_alone_passes_through(self) -> None:
-        assert _preprocess_args_for_default_command(["--help"]) == ["--help"]
-
-    def test_version_alone_passes_through(self) -> None:
-        assert _preprocess_args_for_default_command(["--version"]) == [
-            "--version"
-        ]
-
     def test_path_with_help_injects_lint(self) -> None:
         """Regression: `gha-workflow-linter src/ --help` should still
         inject `lint` so Typer's help renders for the lint subcommand

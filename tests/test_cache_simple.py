@@ -407,9 +407,16 @@ class TestCachePrime:
     def test_prime_does_not_print(
         self, capsys: pytest.CaptureFixture[str]
     ) -> None:
-        """Sanity: prime() must not write to stdout/stderr regardless of
-        what it does internally; the CLI layer owns user-facing output."""
+        """Sanity: prime() must not write user-facing output (Rich
+        ``console.print`` calls or bare ``print()``) to stdout/stderr.
+        Diagnostic logs (``self.logger.debug(...)``) are *expected* and
+        belong to the logging subsystem; they only become user-visible
+        when the CLI ``--verbose`` flag opts the user in. We silence
+        the cache logger for this test so ambient logging configuration
+        from earlier tests in the suite cannot bleed into the
+        assertion."""
         import json
+        import logging
 
         stale = {
             "_metadata": {
@@ -424,7 +431,17 @@ class TestCachePrime:
         cache_path.write_text(json.dumps(stale))
 
         cache = ValidationCache(self.cache_config)
-        cache.prime()
+        # Suppress the cache logger so its DEBUG output (which we
+        # explicitly want to allow in production behind --verbose)
+        # cannot bleed into stderr via any handler installed by an
+        # earlier test in the suite.
+        cache_logger = logging.getLogger("gha_workflow_linter.cache")
+        previous_level = cache_logger.level
+        cache_logger.setLevel(logging.CRITICAL + 1)
+        try:
+            cache.prime()
+        finally:
+            cache_logger.setLevel(previous_level)
         captured = capsys.readouterr()
         assert captured.out == ""
         assert captured.err == ""
@@ -485,10 +502,15 @@ class TestStandaloneCacheConsumers:
 
     def test_validator_primes_own_cache_via_validate(self) -> None:
         """``ActionCallValidator`` primes lazily on its first
-        validation call so the validator constructor stays cheap.
-        Verify the prime happens before any per-ref work."""
+        ``validate_action_calls_async`` call so the constructor stays
+        cheap. Verify priming happens via the public entry point —
+        not by reaching into the private ``_cache.prime()`` directly —
+        so the test exercises the actual user-visible behavior.
+        """
+        import asyncio
+
         from gha_workflow_linter._version import __version__
-        from gha_workflow_linter.models import Config
+        from gha_workflow_linter.models import Config, ValidationMethod
         from gha_workflow_linter.validator import ActionCallValidator
 
         self._seed_stale_cache()
@@ -497,15 +519,37 @@ class TestStandaloneCacheConsumers:
                 enabled=True,
                 cache_dir=self._temp_cache_dir,
                 cache_file="validation_cache.json",
-            )
+            ),
+            validation_method=ValidationMethod.GIT,
         )
         validator = ActionCallValidator(config)
         # Constructor shouldn't have primed yet (lazy).
         assert validator._cache._loaded is False
-        # Any prime() call (e.g. via the public method) primes.
-        report = validator._cache.prime()
-        assert report.version_mismatch_purged is True
-        assert validator._cache._cache_version == __version__
+
+        # Drive the public validation path through the async entry
+        # point with an empty work-set; this short-circuits past the
+        # GitHub / Git client invocations but still runs the
+        # cache.prime() call at the top of validate_action_calls_async.
+        async def _run() -> None:
+            async with validator:
+                await validator.validate_action_calls_async({})
+
+        asyncio.run(_run())
+
+        # The prime() call inside validate_action_calls_async loaded
+        # and purged the stale cache file. We funnel the assertions
+        # through a nested helper so mypy doesn't flag them as
+        # unreachable: validator.validate_action_calls_async has two
+        # branches that ``raise RuntimeError`` if the corresponding
+        # client isn't initialized, which mypy infers as
+        # ``NoReturn``-ish even though both branches are guarded by
+        # __aenter__ at runtime.
+        def _assert_purged() -> None:
+            assert validator._cache._loaded is True
+            assert validator._cache._version_mismatch_purged is True
+            assert validator._cache._cache_version == __version__
+
+        _assert_purged()
 
     def test_autofixer_skip_priming_when_shared_cache_provided(
         self,
