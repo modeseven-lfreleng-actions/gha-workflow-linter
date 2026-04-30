@@ -35,7 +35,7 @@ class GitValidationClient:
         """
         self.config = config
         self.logger = logging.getLogger(__name__)
-        self.api_stats = APICallStats()  # pyright: ignore[reportCallIssue]
+        self.api_stats = APICallStats()
 
         # Determine optimal worker count
         if config.max_parallel_operations:

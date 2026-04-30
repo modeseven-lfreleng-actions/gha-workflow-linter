@@ -65,7 +65,7 @@ class ActionCallValidator:
         self.logger = logging.getLogger(__name__)
         self._github_client: GitHubGraphQLClient | None = None
         self._git_client: GitValidationClient | None = None
-        self.api_stats = APICallStats()  # pyright: ignore[reportCallIssue]
+        self.api_stats = APICallStats()
         self._cache = (
             cache if cache is not None else ValidationCache(config.cache)
         )

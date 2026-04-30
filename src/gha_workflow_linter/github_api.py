@@ -49,8 +49,8 @@ class GitHubGraphQLClient:
         # no constructor args (keyword args are still accepted), but
         # basedpyright reports the no-arg call as missing parameters.
         # Suppress that one diagnostic on the calls below.
-        self._rate_limit_info = GitHubRateLimitInfo()  # pyright: ignore[reportCallIssue]
-        self.api_stats = APICallStats()  # pyright: ignore[reportCallIssue]
+        self._rate_limit_info = GitHubRateLimitInfo()
+        self.api_stats = APICallStats()
 
         # Get GitHub token from config (which handles environment fallback)
         self._token = config.token or os.getenv("GITHUB_TOKEN")

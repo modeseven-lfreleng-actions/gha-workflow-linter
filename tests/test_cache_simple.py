@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 """Simple tests for cache module to improve coverage."""
+# pyright: reportUninitializedInstanceVariable=false
 
 from __future__ import annotations
 
@@ -31,7 +32,7 @@ class TestCachedValidationEntry:
         """Test CachedValidationEntry initialization."""
         result = ValidationResult.VALID
 
-        entry = CachedValidationEntry(  # pyright: ignore[reportCallIssue]
+        entry = CachedValidationEntry(
             repository="actions/checkout",
             reference="v4",
             result=result,
@@ -48,7 +49,7 @@ class TestCachedValidationEntry:
         """Test checking if entry is not expired."""
         result = ValidationResult.VALID
 
-        entry = CachedValidationEntry(  # pyright: ignore[reportCallIssue]
+        entry = CachedValidationEntry(
             repository="actions/checkout",
             reference="v4",
             result=result,
@@ -64,7 +65,7 @@ class TestCachedValidationEntry:
         result = ValidationResult.VALID
 
         # Create entry with old timestamp
-        entry = CachedValidationEntry(  # pyright: ignore[reportCallIssue]
+        entry = CachedValidationEntry(
             repository="actions/checkout",
             reference="v4",
             result=result,
@@ -81,7 +82,7 @@ class TestCachedValidationEntry:
 
         # Create entry with timestamp 100 seconds ago
         old_time = time.time() - 100
-        entry = CachedValidationEntry(  # pyright: ignore[reportCallIssue]
+        entry = CachedValidationEntry(
             repository="actions/checkout",
             reference="v4",
             result=result,
@@ -102,14 +103,12 @@ class TestValidationCache:
         # it. Using mkdtemp() + a fixed filename avoids the race conditions
         # tempfile.mktemp() exposes (where another process could create the
         # named path between mktemp() and our first write).
-        self._temp_cache_dir = Path(  # pyright: ignore[reportUninitializedInstanceVariable]
+        self._temp_cache_dir = Path(
             tempfile.mkdtemp(prefix="gha-workflow-linter-cache-")
         )
-        self.temp_cache_file_path = str(  # pyright: ignore[reportUninitializedInstanceVariable]
-            self._temp_cache_dir / "cache.json"
-        )
+        self.temp_cache_file_path = str(self._temp_cache_dir / "cache.json")
 
-        self.cache_config = CacheConfig(  # pyright: ignore[reportUninitializedInstanceVariable, reportCallIssue]
+        self.cache_config = CacheConfig(
             enabled=True,
             cache_dir=self._temp_cache_dir,
             cache_file="cache.json",
@@ -129,7 +128,7 @@ class TestValidationCache:
 
     def test_init_with_default_config(self) -> None:
         """Test ValidationCache with default config."""
-        default_config = CacheConfig()  # pyright: ignore[reportCallIssue]
+        default_config = CacheConfig()
         cache = ValidationCache(default_config)
         assert isinstance(cache.config, CacheConfig)
 
@@ -141,14 +140,14 @@ class TestValidationCache:
 
     def test_enabled_true(self) -> None:
         """Test cache enabled property when enabled."""
-        cache_config = CacheConfig(enabled=True)  # pyright: ignore[reportCallIssue]
+        cache_config = CacheConfig(enabled=True)
         cache = ValidationCache(cache_config)
 
         assert cache.config.enabled is True
 
     def test_enabled_false(self) -> None:
         """Test cache enabled property when disabled."""
-        cache_config = CacheConfig(enabled=False)  # pyright: ignore[reportCallIssue]
+        cache_config = CacheConfig(enabled=False)
         cache = ValidationCache(cache_config)
 
         assert cache.config.enabled is False
@@ -182,7 +181,7 @@ class TestValidationCache:
         cache = ValidationCache(self.cache_config)
 
         # Add an expired entry
-        old_entry = CachedValidationEntry(  # pyright: ignore[reportCallIssue]
+        old_entry = CachedValidationEntry(
             repository="old/repo",
             reference="v1",
             result=ValidationResult.VALID,
@@ -199,7 +198,7 @@ class TestValidationCache:
 
     def test_cache_disabled_operations(self) -> None:
         """Test cache operations when disabled."""
-        cache_config = CacheConfig(enabled=False)  # pyright: ignore[reportCallIssue]
+        cache_config = CacheConfig(enabled=False)
         cache = ValidationCache(cache_config)
 
         # Should not raise when cache is disabled
@@ -227,10 +226,10 @@ class TestCachePrime:
     """
 
     def setup_method(self) -> None:
-        self._temp_cache_dir = pathlib.Path(  # pyright: ignore[reportUninitializedInstanceVariable]
+        self._temp_cache_dir = pathlib.Path(
             tempfile.mkdtemp(prefix="gha-workflow-linter-prime-")
         )
-        self.cache_config = CacheConfig(  # pyright: ignore[reportUninitializedInstanceVariable, reportCallIssue]
+        self.cache_config = CacheConfig(
             enabled=True,
             cache_dir=self._temp_cache_dir,
             cache_file="cache.json",
@@ -258,7 +257,7 @@ class TestCachePrime:
     def test_prime_disabled_cache_no_op(self) -> None:
         from gha_workflow_linter.cache import CachePrimeReport
 
-        config = CacheConfig(  # pyright: ignore[reportCallIssue]
+        config = CacheConfig(
             enabled=False,
             cache_dir=self._temp_cache_dir,
             cache_file="cache.json",
@@ -457,7 +456,7 @@ class TestStandaloneCacheConsumers:
     """
 
     def setup_method(self) -> None:
-        self._temp_cache_dir = pathlib.Path(  # pyright: ignore[reportUninitializedInstanceVariable]
+        self._temp_cache_dir = pathlib.Path(
             tempfile.mkdtemp(prefix="gha-workflow-linter-standalone-")
         )
 
@@ -485,8 +484,8 @@ class TestStandaloneCacheConsumers:
         from gha_workflow_linter.models import Config
 
         self._seed_stale_cache()
-        config = Config(  # pyright: ignore[reportCallIssue]
-            cache=CacheConfig(  # pyright: ignore[reportCallIssue]
+        config = Config(
+            cache=CacheConfig(
                 enabled=True,
                 cache_dir=self._temp_cache_dir,
                 cache_file="validation_cache.json",
@@ -514,8 +513,8 @@ class TestStandaloneCacheConsumers:
         from gha_workflow_linter.validator import ActionCallValidator
 
         self._seed_stale_cache()
-        config = Config(  # pyright: ignore[reportCallIssue]
-            cache=CacheConfig(  # pyright: ignore[reportCallIssue]
+        config = Config(
+            cache=CacheConfig(
                 enabled=True,
                 cache_dir=self._temp_cache_dir,
                 cache_file="validation_cache.json",
@@ -561,8 +560,8 @@ class TestStandaloneCacheConsumers:
         from gha_workflow_linter.auto_fix import AutoFixer
         from gha_workflow_linter.models import Config
 
-        config = Config(  # pyright: ignore[reportCallIssue]
-            cache=CacheConfig(  # pyright: ignore[reportCallIssue]
+        config = Config(
+            cache=CacheConfig(
                 enabled=True,
                 cache_dir=self._temp_cache_dir,
                 cache_file="validation_cache.json",

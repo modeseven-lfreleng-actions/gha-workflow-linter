@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 """Comprehensive tests for GitHub GraphQL API client."""
+# pyright: reportUninitializedInstanceVariable=false
 
 from __future__ import annotations
 
@@ -29,12 +30,9 @@ from gha_workflow_linter.models import (
 class TestGitHubGraphQLClient:
     """Test GitHub GraphQL API client."""
 
-    config: GitHubAPIConfig  # pyright: ignore[reportUninitializedInstanceVariable]
-    client: GitHubGraphQLClient  # pyright: ignore[reportUninitializedInstanceVariable]
-
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.config = GitHubAPIConfig(  # pyright: ignore[reportCallIssue]
+        self.config = GitHubAPIConfig(
             token="ghp_test123",
             base_url="https://api.github.com/graphql",
             timeout=30.0,
@@ -53,14 +51,14 @@ class TestGitHubGraphQLClient:
 
     def test_init_without_token(self) -> None:
         """Test client initialization without token."""
-        config = GitHubAPIConfig(token=None)  # pyright: ignore[reportCallIssue]
+        config = GitHubAPIConfig(token=None)
         with patch.dict("os.environ", {}, clear=True):
             client = GitHubGraphQLClient(config)
             assert client._token is None
 
     def test_init_with_env_token(self) -> None:
         """Test client initialization with environment token."""
-        config = GitHubAPIConfig(token=None)  # pyright: ignore[reportCallIssue]
+        config = GitHubAPIConfig(token=None)
         with patch.dict("os.environ", {"GITHUB_TOKEN": "env_token123"}):
             client = GitHubGraphQLClient(config)
             assert client._token == "env_token123"
@@ -81,7 +79,7 @@ class TestGitHubGraphQLClient:
     @pytest.mark.asyncio
     async def test_aenter_without_token(self) -> None:
         """Test async context manager entry without token."""
-        config = GitHubAPIConfig(token=None)  # pyright: ignore[reportCallIssue]
+        config = GitHubAPIConfig(token=None)
         client = GitHubGraphQLClient(config)
 
         with patch("httpx.AsyncClient") as mock_client_class:
@@ -681,11 +679,9 @@ class TestGitHubGraphQLClient:
 class TestGitHubGraphQLClientIntegration:
     """Integration tests for GitHub GraphQL client."""
 
-    config: GitHubAPIConfig  # pyright: ignore[reportUninitializedInstanceVariable]
-
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.config = GitHubAPIConfig(  # pyright: ignore[reportCallIssue]
+        self.config = GitHubAPIConfig(
             token="ghp_test123",
             batch_size=2,  # Small batch size for testing
         )

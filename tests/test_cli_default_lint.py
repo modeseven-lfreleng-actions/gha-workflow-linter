@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 """Tests for CLI default lint behavior (no subcommand)."""
+# pyright: reportUninitializedInstanceVariable=false
 
 from __future__ import annotations
 
@@ -18,8 +19,6 @@ from gha_workflow_linter.models import ValidationMethod
 
 class TestCLIDefaultLint:
     """Test that CLI invokes lint by default when no subcommand is provided."""
-
-    runner: CliRunner  # pyright: ignore[reportUninitializedInstanceVariable]
 
     def setup_method(self) -> None:
         """Set up test fixtures."""

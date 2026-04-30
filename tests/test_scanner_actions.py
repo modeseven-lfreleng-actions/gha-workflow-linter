@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 """Tests for action.yaml and action.yml file scanning."""
+# pyright: reportUninitializedInstanceVariable=false
 
 from __future__ import annotations
 
@@ -18,8 +19,8 @@ class TestActionFileScanning:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.config = Config()  # pyright: ignore[reportUninitializedInstanceVariable, reportCallIssue]
-        self.scanner = WorkflowScanner(self.config)  # pyright: ignore[reportUninitializedInstanceVariable]
+        self.config = Config()
+        self.scanner = WorkflowScanner(self.config)
 
     def create_temp_action(
         self, content: str, name: str = "action.yml", subdir: str | None = None
@@ -183,7 +184,7 @@ runs:
   steps:
     - uses: actions/checkout@v4
 """
-        config = Config(skip_actions=True)  # pyright: ignore[reportCallIssue]
+        config = Config(skip_actions=True)
         scanner = WorkflowScanner(config)
 
         temp_dir = self.create_temp_action(action_content, "action.yml")
@@ -206,7 +207,7 @@ runs:
   steps:
     - uses: actions/checkout@v4
 """
-        config = Config(skip_actions=False)  # pyright: ignore[reportCallIssue]
+        config = Config(skip_actions=False)
         scanner = WorkflowScanner(config)
 
         temp_dir = self.create_temp_action(action_content, "action.yml")
@@ -312,7 +313,7 @@ runs:
   steps:
     - uses: actions/checkout@v4
 """
-        config = Config(exclude_patterns=["test"])  # pyright: ignore[reportCallIssue]
+        config = Config(exclude_patterns=["test"])
         scanner = WorkflowScanner(config)
 
         temp_dir = Path(tempfile.mkdtemp())
@@ -449,7 +450,7 @@ runs:
 
         results = {
             Path("ci.yml"): {
-                1: ActionCall(  # pyright: ignore[reportCallIssue]
+                1: ActionCall(
                     raw_line="uses: actions/checkout@v4",
                     line_number=1,
                     organization="actions",
@@ -458,7 +459,7 @@ runs:
                 )
             },
             Path("action.yml"): {
-                2: ActionCall(  # pyright: ignore[reportCallIssue]
+                2: ActionCall(
                     raw_line="uses: actions/setup-node@v3",
                     line_number=2,
                     organization="actions",

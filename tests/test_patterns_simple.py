@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 """Simple tests for patterns module to improve coverage."""
+# pyright: reportUninitializedInstanceVariable=false
 
 from __future__ import annotations
 
@@ -14,7 +15,7 @@ class TestActionCallPatterns:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.patterns = ActionCallPatterns()  # pyright: ignore[reportUninitializedInstanceVariable]
+        self.patterns = ActionCallPatterns()
 
     def test_init(self) -> None:
         """Test ActionCallPatterns initialization."""

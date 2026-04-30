@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 """Comprehensive tests for ActionCallValidator."""
+# pyright: reportUninitializedInstanceVariable=false
 
 from __future__ import annotations
 
@@ -34,8 +35,8 @@ class TestActionCallValidator:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.config = Config(require_pinned_sha=False)  # pyright: ignore[reportUninitializedInstanceVariable, reportCallIssue]
-        self.validator = ActionCallValidator(self.config)  # pyright: ignore[reportUninitializedInstanceVariable]
+        self.config = Config(require_pinned_sha=False)
+        self.validator = ActionCallValidator(self.config)
 
     def test_init(self) -> None:
         """Test validator initialization."""
@@ -183,7 +184,8 @@ class TestActionCallValidator:
                 error = result[0]
                 assert error.file_path == Path("test.yml")
                 assert error.result == ValidationResult.INVALID_REPOSITORY
-                assert "not found" in error.error_message.lower()  # pyright: ignore[reportOptionalMemberAccess]
+                assert error.error_message is not None
+                assert "not found" in error.error_message.lower()
 
     @pytest.mark.asyncio
     async def test_validate_action_calls_async_reference_not_found(
@@ -234,13 +236,14 @@ class TestActionCallValidator:
                 error = result[0]
                 assert error.file_path == Path("test.yml")
                 assert error.result == ValidationResult.INVALID_REFERENCE
-                assert "invalid" in error.error_message.lower()  # pyright: ignore[reportOptionalMemberAccess]
+                assert error.error_message is not None
+                assert "invalid" in error.error_message.lower()
 
     @pytest.mark.asyncio
     async def test_validate_action_calls_async_unpinned_sha(self) -> None:
         """Test validation with unpinned SHA when required."""
         # Configure to require pinned SHAs
-        config = Config(require_pinned_sha=True)  # pyright: ignore[reportCallIssue]
+        config = Config(require_pinned_sha=True)
         validator = ActionCallValidator(config)
 
         action_call = ActionCall(
@@ -471,7 +474,9 @@ class TestActionCallValidator:
         workflow_calls = {Path("test.yml"): {1: action_call}}
 
         mock_progress = Mock(spec=Progress)
-        mock_task_id = 1  # Use an int instead of Mock for TaskID
+        # TaskID is a NewType over int; cast a plain literal so the
+        # type-checker accepts it as a TaskID for the parameter.
+        mock_task_id: TaskID = TaskID(1)
 
         with (
             patch(
@@ -502,7 +507,7 @@ class TestActionCallValidator:
                 result = await self.validator.validate_action_calls_async(
                     workflow_calls,
                     mock_progress,
-                    mock_task_id,  # pyright: ignore[reportArgumentType]
+                    mock_task_id,
                 )
 
                 assert result == []
@@ -539,7 +544,7 @@ class TestActionCallValidator:
     def test_extract_repository_for_validation_workflow_call(self) -> None:
         """Test repository extraction for reusable workflow calls."""
         # Test workflow call with full path
-        workflow_call = ActionCall(  # pyright: ignore[reportCallIssue]
+        workflow_call = ActionCall(
             raw_line="uses: lfit/releng-reusable-workflows/.github/workflows/test.yaml@main",
             line_number=1,
             organization="lfit",
@@ -557,7 +562,7 @@ class TestActionCallValidator:
     def test_extract_repository_for_validation_action_call(self) -> None:
         """Test repository extraction for regular action calls."""
         # Test regular action call
-        action_call = ActionCall(  # pyright: ignore[reportCallIssue]
+        action_call = ActionCall(
             raw_line="uses: actions/checkout@v4",
             line_number=1,
             organization="actions",
@@ -573,7 +578,7 @@ class TestActionCallValidator:
     def test_combine_validation_results_uses_extracted_repo_name(self) -> None:
         """Test that _combine_validation_results uses extracted repository names for workflows."""
         # Create a workflow call
-        workflow_call = ActionCall(  # pyright: ignore[reportCallIssue]
+        workflow_call = ActionCall(
             raw_line="uses: lfit/releng-reusable-workflows/.github/workflows/test.yaml@1a9d1394836d7511179d478facd9466a9e45596e",
             line_number=1,
             organization="lfit",
@@ -620,10 +625,10 @@ class TestActionCallValidator:
 
     def test_merge_api_stats(self) -> None:
         """Test merging API statistics."""
-        stats1 = APICallStats()  # pyright: ignore[reportCallIssue]
+        stats1 = APICallStats()
         stats1.graphql_calls = 5
 
-        stats2 = APICallStats()  # pyright: ignore[reportCallIssue]
+        stats2 = APICallStats()
         stats2.graphql_calls = 3
 
         # The _merge_api_stats method doesn't exist, test basic stats instead
@@ -673,18 +678,25 @@ class TestActionCallValidator:
         )
 
     def test_get_api_stats(self) -> None:
-        """Test getting API statistics."""
-        # Set up some stats in the validator
-        if hasattr(self.validator, "_api_stats"):
-            self.validator._api_stats = APICallStats()  # pyright: ignore[reportCallIssue, reportAttributeAccessIssue]
-            self.validator._api_stats.graphql_calls = 5  # pyright: ignore[reportAttributeAccessIssue]
+        """Test getting API statistics.
 
-            stats = self.validator.get_api_stats()
-            assert stats.graphql_calls == 5
-        else:
-            # If no stats exist, should return default
-            stats = self.validator.get_api_stats()
-            assert isinstance(stats, APICallStats)
+        ``ActionCallValidator`` exposes ``api_stats`` as a public
+        attribute (no underscore prefix). The original test checked
+        for a private ``_api_stats`` name that never existed, making
+        the ``if`` branch dead code; rewrite to exercise the actual
+        public API.
+        """
+        # Modify the public attribute and confirm get_api_stats()
+        # returns a copy (not the live reference) reflecting the
+        # change.
+        self.validator.api_stats.graphql_calls = 5
+        stats = self.validator.get_api_stats()
+        assert isinstance(stats, APICallStats)
+        assert stats.graphql_calls == 5
+        # get_api_stats returns a model_copy; mutating the returned
+        # value must not affect the validator's own state.
+        stats.graphql_calls = 99
+        assert self.validator.api_stats.graphql_calls == 5
 
 
 class TestActionCallValidatorDeduplication:
@@ -692,8 +704,8 @@ class TestActionCallValidatorDeduplication:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.config = Config(require_pinned_sha=False)  # pyright: ignore[reportUninitializedInstanceVariable, reportCallIssue]
-        self.validator = ActionCallValidator(self.config)  # pyright: ignore[reportUninitializedInstanceVariable]
+        self.config = Config(require_pinned_sha=False)
+        self.validator = ActionCallValidator(self.config)
 
     @pytest.mark.asyncio
     async def test_deduplication_reduces_api_calls(self) -> None:

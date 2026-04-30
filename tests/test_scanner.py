@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 """Tests for workflow scanner."""
+# pyright: reportUninitializedInstanceVariable=false
 
 from __future__ import annotations
 
@@ -18,8 +19,8 @@ class TestWorkflowScanner:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.config = Config()  # pyright: ignore[reportUninitializedInstanceVariable, reportCallIssue]
-        self.scanner = WorkflowScanner(self.config)  # pyright: ignore[reportUninitializedInstanceVariable]
+        self.config = Config()
+        self.scanner = WorkflowScanner(self.config)
 
     def test_init(self) -> None:
         """Test WorkflowScanner initialization."""
@@ -91,7 +92,7 @@ jobs:
 
     def test_find_workflow_files_exclude_patterns(self) -> None:
         """Test excluding files based on patterns."""
-        config = Config(exclude_patterns=["test*", "*.tmp"])  # pyright: ignore[reportCallIssue]
+        config = Config(exclude_patterns=["test*", "*.tmp"])
         scanner = WorkflowScanner(config)
 
         workflow_content = "name: Test\non: [push]\njobs: {}"
@@ -293,7 +294,7 @@ on: [push]
 
     def test_should_exclude_file_basic(self) -> None:
         """Test checking if file should be excluded."""
-        config = Config(exclude_patterns=["test", ".tmp"])  # pyright: ignore[reportCallIssue]
+        config = Config(exclude_patterns=["test", ".tmp"])
         scanner = WorkflowScanner(config)
 
         # Should exclude (pattern matches substring in path)
@@ -331,7 +332,7 @@ jobs: invalid [
 
         results = {
             Path("test1.yml"): {
-                1: ActionCall(  # pyright: ignore[reportCallIssue]
+                1: ActionCall(
                     raw_line="uses: actions/checkout@v4",
                     line_number=1,
                     organization="actions",
@@ -340,7 +341,7 @@ jobs: invalid [
                 )
             },
             Path("test2.yml"): {
-                2: ActionCall(  # pyright: ignore[reportCallIssue]
+                2: ActionCall(
                     raw_line="uses: actions/setup-node@abc123",
                     line_number=2,
                     organization="actions",
@@ -467,7 +468,7 @@ jobs:
 
     def test_should_exclude_file_patterns(self) -> None:
         """Test checking if file should be excluded based on patterns."""
-        config = Config(exclude_patterns=["test", "tmp"])  # pyright: ignore[reportCallIssue]
+        config = Config(exclude_patterns=["test", "tmp"])
         scanner = WorkflowScanner(config)
 
         # Should exclude (pattern in path string)
@@ -479,7 +480,7 @@ jobs:
 
     def test_should_exclude_file_no_patterns(self) -> None:
         """Test checking exclude when no patterns are configured."""
-        config = Config(exclude_patterns=[])  # pyright: ignore[reportCallIssue]
+        config = Config(exclude_patterns=[])
         scanner = WorkflowScanner(config)
 
         # Should never exclude when no patterns configured

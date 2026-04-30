@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 """Tests for CLI interface."""
+# pyright: reportUninitializedInstanceVariable=false
 
 from __future__ import annotations
 
@@ -155,7 +156,7 @@ class TestCLICommands:
 
     def setup_method(self) -> None:
         """Set up test fragments."""
-        self.runner = CliRunner()  # pyright: ignore[reportUninitializedInstanceVariable]
+        self.runner = CliRunner()
 
     def test_main_help(self) -> None:
         """Test main app help."""

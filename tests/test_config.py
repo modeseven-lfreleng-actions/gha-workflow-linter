@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 """Tests for configuration management."""
+# pyright: reportUninitializedInstanceVariable=false
 
 from __future__ import annotations
 
@@ -22,7 +23,7 @@ class TestConfigManager:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.config_manager = ConfigManager()  # pyright: ignore[reportUninitializedInstanceVariable]
+        self.config_manager = ConfigManager()
 
     def test_init(self) -> None:
         """Test ConfigManager initialization."""

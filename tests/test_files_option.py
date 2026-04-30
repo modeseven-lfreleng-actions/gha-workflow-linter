@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 """Tests for --files CLI option."""
+# pyright: reportUninitializedInstanceVariable=false
 
 from __future__ import annotations
 
@@ -19,7 +20,7 @@ class TestFilesOption:
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.runner = CliRunner()  # pyright: ignore[reportUninitializedInstanceVariable]
+        self.runner = CliRunner()
 
     def create_test_workspace(self) -> Path:
         """Create a test workspace with multiple workflow files."""
@@ -236,7 +237,7 @@ runs:
         # Mock validation to return an error for ci.yml
         error = ValidationError(
             file_path=ci_file,
-            action_call=ActionCall(  # pyright: ignore[reportCallIssue]
+            action_call=ActionCall(
                 raw_line="uses: actions/checkout@v4",
                 line_number=7,
                 organization="actions",
@@ -431,7 +432,7 @@ runs:
         # Mock validation to return an error (invalid SHA)
         error = ValidationError(
             file_path=ci_file,
-            action_call=ActionCall(  # pyright: ignore[reportCallIssue]
+            action_call=ActionCall(
                 raw_line="uses: actions/checkout@invalid123",
                 line_number=7,
                 organization="actions",

@@ -88,10 +88,11 @@ class CachedValidationEntry(BaseModel):
         ..., description="Type of API call that generated this result"
     )
     validation_method: ValidationMethod = Field(
-        ValidationMethod.GITHUB_API, description="Validation method used"
+        default=ValidationMethod.GITHUB_API,
+        description="Validation method used",
     )
     error_message: str | None = Field(
-        None, description="Error message if validation failed"
+        default=None, description="Error message if validation failed"
     )
 
     def is_expired(self, ttl_seconds: int) -> bool:
@@ -107,13 +108,15 @@ class CachedValidationEntry(BaseModel):
 class CacheStats(BaseModel):
     """Statistics for cache operations."""
 
-    hits: int = Field(0, description="Number of cache hits")
-    misses: int = Field(0, description="Number of cache misses")
-    expired: int = Field(0, description="Number of expired entries encountered")
-    writes: int = Field(0, description="Number of cache writes")
-    purges: int = Field(0, description="Number of cache purges")
+    hits: int = Field(default=0, description="Number of cache hits")
+    misses: int = Field(default=0, description="Number of cache misses")
+    expired: int = Field(
+        default=0, description="Number of expired entries encountered"
+    )
+    writes: int = Field(default=0, description="Number of cache writes")
+    purges: int = Field(default=0, description="Number of cache purges")
     cleanup_removed: int = Field(
-        0, description="Number of entries removed during cleanup"
+        default=0, description="Number of entries removed during cleanup"
     )
 
     @property
@@ -140,14 +143,14 @@ class CachePrimeReport(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     version_mismatch_purged: bool = Field(
-        False,
+        default=False,
         description=(
             "True iff the on-disk cache was created by a different tool "
             "version and was purged during prime()."
         ),
     )
     suspicious_patterns_purged: bool = Field(
-        False,
+        default=False,
         description=(
             "True iff prime() detected suspicious patterns (high error "
             "rate, etc.) in the loaded cache and purged it."
@@ -344,7 +347,7 @@ class ValidationCache:
             A ``CachePrimeReport`` describing the outcomes.
         """
         if not self.config.enabled or self._loaded:
-            return CachePrimeReport()  # pyright: ignore[reportCallIssue]
+            return CachePrimeReport()
 
         self._load_cache()
         version_mismatch_purged = self._version_mismatch_purged

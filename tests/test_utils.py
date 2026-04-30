@@ -252,7 +252,7 @@ class TestHasTestComment:
 
     def test_has_test_comment_returns_false_for_none_comment(self) -> None:
         """Test that None comment returns False (using default from model)."""
-        action_call = ActionCall(  # pyright: ignore[reportCallIssue]
+        action_call = ActionCall(
             raw_line="uses: actions/checkout@main",
             line_number=10,
             organization="actions",

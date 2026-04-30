@@ -156,7 +156,7 @@ class ConfigManager:
                 output_path = config_dir / "config.yaml"
 
         # Create default config
-        default_config = Config()  # pyright: ignore[reportCallIssue]
+        default_config = Config()
 
         # Convert to dictionary for YAML serialization
         config_dict: dict[str, object] = {

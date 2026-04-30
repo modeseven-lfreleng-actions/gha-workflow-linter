@@ -88,7 +88,7 @@ class TestAutoFixBehaviorWithPinnedSHA:
     @pytest.fixture
     def config_pinned_required(self) -> Config:
         """Config with require_pinned_sha=True."""
-        return Config(  # pyright: ignore[reportCallIssue]
+        return Config(
             log_level=LogLevel.DEBUG,
             parallel_workers=2,
             require_pinned_sha=True,
@@ -98,7 +98,7 @@ class TestAutoFixBehaviorWithPinnedSHA:
             skip_actions=False,
             fix_test_calls=False,
             validation_method=ValidationMethod.GITHUB_API,
-            cache=CacheConfig(enabled=False),  # pyright: ignore[reportCallIssue]
+            cache=CacheConfig(enabled=False),
             network=NetworkConfig(
                 timeout_seconds=10,
                 max_retries=2,
@@ -110,7 +110,7 @@ class TestAutoFixBehaviorWithPinnedSHA:
     @pytest.fixture
     def config_pinned_not_required(self) -> Config:
         """Config with require_pinned_sha=False."""
-        return Config(  # pyright: ignore[reportCallIssue]
+        return Config(
             log_level=LogLevel.DEBUG,
             parallel_workers=2,
             require_pinned_sha=False,
@@ -120,7 +120,7 @@ class TestAutoFixBehaviorWithPinnedSHA:
             skip_actions=False,
             fix_test_calls=False,
             validation_method=ValidationMethod.GITHUB_API,
-            cache=CacheConfig(enabled=False),  # pyright: ignore[reportCallIssue]
+            cache=CacheConfig(enabled=False),
             network=NetworkConfig(
                 timeout_seconds=10,
                 max_retries=2,
@@ -1634,7 +1634,7 @@ class TestYAMLStructurePreservation:
     @pytest.fixture
     def config_with_pinned_sha(self) -> Config:
         """Config with require_pinned_sha=True."""
-        return Config(  # pyright: ignore[reportCallIssue]
+        return Config(
             log_level=LogLevel.DEBUG,
             parallel_workers=2,
             require_pinned_sha=True,
@@ -1644,7 +1644,7 @@ class TestYAMLStructurePreservation:
             skip_actions=False,
             fix_test_calls=False,
             validation_method=ValidationMethod.GITHUB_API,
-            cache=CacheConfig(enabled=False),  # pyright: ignore[reportCallIssue]
+            cache=CacheConfig(enabled=False),
             network=NetworkConfig(
                 timeout_seconds=10,
                 max_retries=2,

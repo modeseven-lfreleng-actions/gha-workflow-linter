@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 """Comprehensive tests for CLI module with proper mocking."""
+# pyright: reportUninitializedInstanceVariable=false
 
 from __future__ import annotations
 
@@ -273,9 +274,11 @@ class TestOutputFunctions:
         }
 
         table = _create_api_stats_table(validation_summary)
-
-        assert table.title == "API Call Statistics"  # pyright: ignore[reportOptionalMemberAccess]
-        assert len(table.columns) == 2  # pyright: ignore[reportOptionalMemberAccess]
+        # _create_api_stats_table returns None when api_calls_total==0;
+        # this test seeds a non-zero count so a Table is guaranteed.
+        assert table is not None
+        assert table.title == "API Call Statistics"
+        assert len(table.columns) == 2
 
     def test_display_validation_summary_no_errors(self) -> None:
         """Test displaying validation summary with no errors."""
@@ -482,13 +485,10 @@ class TestOutputFunctions:
 class TestRunLinter:
     """Test the main linter execution function."""
 
-    config: Config  # pyright: ignore[reportUninitializedInstanceVariable]
-    options: CLIOptions  # pyright: ignore[reportUninitializedInstanceVariable]
-
     def setup_method(self) -> None:
         """Set up test fixtures."""
-        self.config = Config()  # pyright: ignore[reportCallIssue]
-        self.options = CLIOptions(  # pyright: ignore[reportCallIssue]
+        self.config = Config()
+        self.options = CLIOptions(
             path=Path("/tmp"),
             verbose=False,
             quiet=False,
@@ -825,7 +825,7 @@ class TestRunLinter:
     ) -> None:
         """Test linter with JSON output format."""
         # Update options for JSON output
-        options = CLIOptions(  # pyright: ignore[reportCallIssue]
+        options = CLIOptions(
             path=Path("/tmp"),
             verbose=False,
             quiet=False,
@@ -851,7 +851,7 @@ class TestRunLinter:
         mock_validator.get_validation_summary.return_value = {
             "total_validated": 1,
             "errors": 0,
-            "api_stats": APICallStats(),  # pyright: ignore[reportCallIssue]
+            "api_stats": APICallStats(),
         }
 
         # Mock progress
@@ -870,8 +870,6 @@ class TestRunLinter:
 
 class TestCLIIntegration:
     """Test CLI integration using CliRunner."""
-
-    runner: CliRunner  # pyright: ignore[reportUninitializedInstanceVariable]
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
@@ -901,7 +899,7 @@ class TestCLIIntegration:
     ) -> None:
         """Test basic lint command execution."""
         # Mock config manager
-        mock_config_manager.return_value.load_config.return_value = Config()  # pyright: ignore[reportCallIssue]
+        mock_config_manager.return_value.load_config.return_value = Config()
 
         # Mock run_linter to return success
         mock_run_linter.return_value = 0
@@ -917,7 +915,7 @@ class TestCLIIntegration:
         self, mock_config_manager
     ) -> None:
         """Test lint command with conflicting verbose and quiet flags."""
-        mock_config_manager.return_value.load_config.return_value = Config()  # pyright: ignore[reportCallIssue]
+        mock_config_manager.return_value.load_config.return_value = Config()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             result = self.runner.invoke(
@@ -953,7 +951,7 @@ class TestCLIIntegration:
         self, mock_cache_class, mock_config_manager
     ) -> None:
         """Test cache info command."""
-        mock_config_manager.return_value.load_config.return_value = Config()  # pyright: ignore[reportCallIssue]
+        mock_config_manager.return_value.load_config.return_value = Config()
 
         mock_cache = Mock()
         mock_cache.get_cache_info.return_value = {
@@ -984,7 +982,7 @@ class TestCLIIntegration:
         self, mock_cache_class, mock_config_manager
     ) -> None:
         """Test cache cleanup command."""
-        mock_config_manager.return_value.load_config.return_value = Config()  # pyright: ignore[reportCallIssue]
+        mock_config_manager.return_value.load_config.return_value = Config()
 
         mock_cache = Mock()
         mock_cache.cleanup.return_value = 3
@@ -1001,7 +999,7 @@ class TestCLIIntegration:
         self, mock_cache_class, mock_config_manager
     ) -> None:
         """Test cache purge command."""
-        mock_config_manager.return_value.load_config.return_value = Config()  # pyright: ignore[reportCallIssue]
+        mock_config_manager.return_value.load_config.return_value = Config()
 
         mock_cache = Mock()
         mock_cache.purge.return_value = 15
@@ -1018,7 +1016,7 @@ class TestCLIIntegration:
         self, mock_cache_class, mock_config_manager
     ) -> None:
         """Test cache command with no specific options (default behavior)."""
-        mock_config_manager.return_value.load_config.return_value = Config()  # pyright: ignore[reportCallIssue]
+        mock_config_manager.return_value.load_config.return_value = Config()
 
         mock_cache = Mock()
         mock_cache.get_cache_info.return_value = {
@@ -1052,7 +1050,7 @@ class TestCLIIntegration:
         self, mock_run_linter: Mock, mock_config_manager: Mock
     ) -> None:
         """Test lint command with GitHub token."""
-        mock_config = Config()  # pyright: ignore[reportCallIssue]
+        mock_config = Config()
         mock_config_manager.return_value.load_config.return_value = mock_config
         mock_run_linter.return_value = 0
 
@@ -1071,7 +1069,7 @@ class TestCLIIntegration:
         self, mock_run_linter: Mock, mock_config_manager: Mock
     ) -> None:
         """Test lint command with custom worker count."""
-        mock_config = Config()  # pyright: ignore[reportCallIssue]
+        mock_config = Config()
         mock_config_manager.return_value.load_config.return_value = mock_config
         mock_run_linter.return_value = 0
 
@@ -1089,7 +1087,7 @@ class TestCLIIntegration:
         self, mock_run_linter: Mock, mock_config_manager: Mock
     ) -> None:
         """Test lint command with exclude patterns."""
-        mock_config = Config()  # pyright: ignore[reportCallIssue]
+        mock_config = Config()
         mock_config_manager.return_value.load_config.return_value = mock_config
         mock_run_linter.return_value = 0
 
@@ -1108,7 +1106,7 @@ class TestCLIIntegration:
         self, mock_run_linter: Mock, mock_config_manager: Mock
     ) -> None:
         """Test lint command with parallel processing disabled."""
-        mock_config = Config()  # pyright: ignore[reportCallIssue]
+        mock_config = Config()
         mock_config_manager.return_value.load_config.return_value = mock_config
         mock_run_linter.return_value = 0
 
@@ -1126,7 +1124,7 @@ class TestCLIIntegration:
         self, mock_run_linter: Mock, mock_config_manager: Mock
     ) -> None:
         """Test lint command with custom cache TTL."""
-        mock_config = Config()  # pyright: ignore[reportCallIssue]
+        mock_config = Config()
         mock_config_manager.return_value.load_config.return_value = mock_config
         mock_run_linter.return_value = 0
 
@@ -1144,7 +1142,7 @@ class TestCLIIntegration:
         self, mock_run_linter: Mock, mock_config_manager: Mock
     ) -> None:
         """Test lint command with SHA pinning requirement disabled."""
-        mock_config = Config()  # pyright: ignore[reportCallIssue]
+        mock_config = Config()
         mock_config_manager.return_value.load_config.return_value = mock_config
         mock_run_linter.return_value = 0
 
@@ -1162,7 +1160,7 @@ class TestCLIIntegration:
         self, mock_run_linter: Mock, mock_config_manager: Mock
     ) -> None:
         """Test lint command with fail on error disabled."""
-        mock_config_manager.return_value.load_config.return_value = Config()  # pyright: ignore[reportCallIssue]
+        mock_config_manager.return_value.load_config.return_value = Config()
         mock_run_linter.return_value = 0
 
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -1182,7 +1180,7 @@ class TestCLIIntegration:
         self, mock_run_linter: Mock, mock_config_manager: Mock
     ) -> None:
         """Test lint command with JSON output format."""
-        mock_config_manager.return_value.load_config.return_value = Config()  # pyright: ignore[reportCallIssue]
+        mock_config_manager.return_value.load_config.return_value = Config()
         mock_run_linter.return_value = 0
 
         with tempfile.TemporaryDirectory() as temp_dir:

@@ -289,7 +289,7 @@ jobs:
 """)
 
         # Create config with fix_test_calls=False (default)
-        config = Config(  # pyright: ignore[reportCallIssue]
+        config = Config(
             auto_fix=True,
             fix_test_calls=False,
         )
@@ -350,7 +350,7 @@ jobs:
 """)
 
         # Create config with fix_test_calls=True (enabled via --fix-test-calls)
-        config = Config(  # pyright: ignore[reportCallIssue]
+        config = Config(
             auto_fix=True,
             fix_test_calls=True,
         )

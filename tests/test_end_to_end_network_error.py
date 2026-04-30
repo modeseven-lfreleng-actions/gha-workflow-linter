@@ -60,13 +60,13 @@ jobs:
 
         # Use a temporary cache location to avoid interference
         temp_cache_dir = Path(tempfile.mkdtemp()) / "test_cache"
-        return Config(  # pyright: ignore[reportCallIssue]
-            github_api=GitHubAPIConfig(  # pyright: ignore[reportCallIssue]
+        return Config(
+            github_api=GitHubAPIConfig(
                 token=None,
                 base_url="https://nonexistent-domain-for-testing.invalid",
                 graphql_url="https://nonexistent-domain-for-testing.invalid/graphql",
             ),
-            cache=CacheConfig(enabled=True, cache_dir=temp_cache_dir),  # pyright: ignore[reportCallIssue]
+            cache=CacheConfig(enabled=True, cache_dir=temp_cache_dir),
         )
 
     @pytest.fixture
@@ -78,13 +78,13 @@ jobs:
 
         # Use a temporary cache location to avoid interference
         temp_cache_dir = Path(tempfile.mkdtemp()) / "test_cache"
-        return Config(  # pyright: ignore[reportCallIssue]
-            github_api=GitHubAPIConfig(  # pyright: ignore[reportCallIssue]
+        return Config(
+            github_api=GitHubAPIConfig(
                 token=None,
                 base_url="https://api.github.com",
                 graphql_url="https://api.github.com/graphql",
             ),
-            cache=CacheConfig(enabled=True, cache_dir=temp_cache_dir),  # pyright: ignore[reportCallIssue]
+            cache=CacheConfig(enabled=True, cache_dir=temp_cache_dir),
         )
 
     def test_dns_resolution_failure_exits_with_error_code_1(
@@ -96,7 +96,7 @@ jobs:
         but the tool incorrectly reported all actions as invalid.
         Uses a non-existent domain to naturally cause DNS resolution failure.
         """
-        options = CLIOptions(path=sample_repo_with_workflows)  # pyright: ignore[reportCallIssue]
+        options = CLIOptions(path=sample_repo_with_workflows)
 
         # Run the linter - it will naturally fail with DNS resolution error
         # because config_without_token points to nonexistent-domain-for-testing.invalid
@@ -109,7 +109,7 @@ jobs:
         self, sample_repo_with_workflows: Path, config_without_token: Config
     ) -> None:
         """Test that network timeouts result in exit code 1."""
-        options = CLIOptions(path=sample_repo_with_workflows)  # pyright: ignore[reportCallIssue]
+        options = CLIOptions(path=sample_repo_with_workflows)
 
         # Use the same non-existent domain config - it will cause network failure
         exit_code = run_linter(config_without_token, options)
@@ -119,7 +119,7 @@ jobs:
         self, sample_repo_with_workflows: Path, config_without_token: Config
     ) -> None:
         """Test that GitHub API authentication failures result in exit code 1."""
-        options = CLIOptions(path=sample_repo_with_workflows)  # pyright: ignore[reportCallIssue]
+        options = CLIOptions(path=sample_repo_with_workflows)
 
         # Use the same non-existent domain config - it will cause network failure
         exit_code = run_linter(config_without_token, options)
@@ -129,7 +129,7 @@ jobs:
         self, sample_repo_with_workflows: Path, config_without_token: Config
     ) -> None:
         """Test that GitHub API rate limit errors result in exit code 1."""
-        options = CLIOptions(path=sample_repo_with_workflows)  # pyright: ignore[reportCallIssue]
+        options = CLIOptions(path=sample_repo_with_workflows)
 
         # Use the same non-existent domain config - it will cause network failure
         exit_code = run_linter(config_without_token, options)
@@ -147,7 +147,7 @@ jobs:
         This ensures our error handling doesn't break normal operation.
         Uses real GitHub API (may hit rate limits but tests realistic scenario).
         """
-        options = CLIOptions(path=sample_repo_with_workflows)  # pyright: ignore[reportCallIssue]
+        options = CLIOptions(path=sample_repo_with_workflows)
 
         # No mocking - let it hit real GitHub API for successful validation test
         exit_code = run_linter(config_with_real_github_api, options)
@@ -165,7 +165,7 @@ jobs:
         reported as validation failures, confusing users.
         Uses non-existent domain to naturally cause network error.
         """
-        options = CLIOptions(path=sample_repo_with_workflows)  # pyright: ignore[reportCallIssue]
+        options = CLIOptions(path=sample_repo_with_workflows)
 
         # No mocking needed - config_without_token uses non-existent domain
         exit_code = run_linter(config_without_token, options)
@@ -181,7 +181,7 @@ jobs:
 
         This was the core bug - network issues were being reported as action validation failures.
         """
-        options = CLIOptions(path=sample_repo_with_workflows)  # pyright: ignore[reportCallIssue]
+        options = CLIOptions(path=sample_repo_with_workflows)
 
         # Mock the validator to capture what would have been returned
         def capture_validation_errors(*_args, **_kwargs):
@@ -217,14 +217,14 @@ jobs:
         This test verifies the fix for the specific error reported in the GitHub issue.
         """
         # Use configuration similar to pre-commit.ci (no GitHub token)
-        config = Config(  # pyright: ignore[reportCallIssue]
-            github_api=GitHubAPIConfig(  # pyright: ignore[reportCallIssue]
+        config = Config(
+            github_api=GitHubAPIConfig(
                 token=None,  # No token available
                 base_url="https://api.github.com",
                 graphql_url="https://api.github.com/graphql",
             )
         )
-        options = CLIOptions(path=sample_repo_with_workflows)  # pyright: ignore[reportCallIssue]
+        options = CLIOptions(path=sample_repo_with_workflows)
 
         # Simulate the exact error from pre-commit.ci logs with comprehensive mocking
         with patch("httpx.AsyncClient") as mock_client_class:
@@ -252,7 +252,7 @@ jobs:
 
         All network errors should result in ValidationAbortedError, not validation failures.
         """
-        options = CLIOptions(path=sample_repo_with_workflows)  # pyright: ignore[reportCallIssue]
+        options = CLIOptions(path=sample_repo_with_workflows)
 
         network_errors = [
             httpx.RequestError(
@@ -288,7 +288,7 @@ jobs:
 
         This ensures the error handling doesn't permanently disable validation.
         """
-        options = CLIOptions(path=sample_repo_with_workflows)  # pyright: ignore[reportCallIssue]
+        options = CLIOptions(path=sample_repo_with_workflows)
 
         # First attempt: network failure
         with patch("httpx.AsyncClient") as mock_client_class:
