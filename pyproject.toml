@@ -185,13 +185,11 @@ markers = [
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
-source = ["src/gha_workflow_linter"]
+source = ["gha_workflow_linter"]
 omit = [
     "*/tests/*",
     "*/test_*",
     "*/__pycache__/*",
-    "*/venv/*",
-    "*/.venv/*",
 ]
 
 [tool.coverage.report]
