@@ -90,7 +90,7 @@ class GitValidationClient:
         )
 
         # Use asyncio to run the multiprocessing validation
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
 
         with ProcessPoolExecutor(max_workers=self._max_workers) as executor:
             # Submit all validation tasks
@@ -116,7 +116,9 @@ class GitValidationClient:
 
             # Process results
             results = {}
-            for repo, result in zip(repositories, validation_results):
+            for repo, result in zip(
+                repositories, validation_results, strict=True
+            ):
                 if isinstance(result, Exception):
                     self.logger.warning(
                         f"Failed to validate repository {repo}: {result}"
@@ -165,7 +167,7 @@ class GitValidationClient:
                 repo_to_refs[repo] = []
             repo_to_refs[repo].append(ref)
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         results = {}
 
         with ProcessPoolExecutor(max_workers=self._max_workers) as executor:
@@ -197,7 +199,7 @@ class GitValidationClient:
 
             # Process results
             for (repo, refs), repo_results in zip(
-                repo_ref_list, validation_results
+                repo_ref_list, validation_results, strict=True
             ):
                 if isinstance(repo_results, Exception):
                     self.logger.warning(
@@ -309,7 +311,9 @@ class GitValidationClient:
                 # misclassify an internal failure as a bogus subpath.
                 group_results = [e] * len(futures)
 
-            for entries, group_result in zip(entry_groups, group_results):
+            for entries, group_result in zip(
+                entry_groups, group_results, strict=True
+            ):
                 if isinstance(group_result, Exception):
                     self.logger.warning(
                         f"Failed to validate subpaths: {group_result}"

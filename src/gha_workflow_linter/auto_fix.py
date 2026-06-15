@@ -1845,7 +1845,7 @@ class AutoFixer:
         else:
             fetch_results = []
 
-        for repo_key, result in zip(repos_to_fetch, fetch_results):
+        for repo_key, result in zip(repos_to_fetch, fetch_results, strict=True):
             if isinstance(result, Exception):
                 self.logger.debug(
                     f"Failed to fetch latest version for {repo_key}: {result}"
@@ -2400,7 +2400,7 @@ class AutoFixer:
         ]
         fetch_results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        for (repo_key, ref), result in zip(refs, fetch_results):
+        for (repo_key, ref), result in zip(refs, fetch_results, strict=True):
             if isinstance(result, Exception):
                 self.logger.debug(
                     f"Failed to fetch SHA for {repo_key}@{ref}: {result}"
