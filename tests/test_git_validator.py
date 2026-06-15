@@ -31,7 +31,9 @@ def test_base_repository_strips_subpath(repository: str, expected: str) -> None:
     assert _base_repository(repository) == expected
 
 
-def test_validate_repository_exists_uses_base_repo_url(monkeypatch) -> None:
+def test_validate_repository_exists_uses_base_repo_url(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Subdirectory actions validate against the owner/repo remote URL.
 
     Regression test: ``anchore/scan-action/download-grype`` previously built
