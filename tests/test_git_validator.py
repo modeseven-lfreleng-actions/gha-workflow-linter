@@ -344,3 +344,50 @@ async def test_validate_subpaths_batch_gather_failure_is_network_error(
     assert results[("github/codeql-action/analyze", "v3")] == (
         ValidationResult.NETWORK_ERROR
     )
+
+
+@pytest.mark.asyncio
+async def test_validate_subpaths_batch_partial_result_is_network_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A worker dict missing an entry maps that entry to NETWORK_ERROR.
+
+    If ``_validate_repository_subpaths`` ever returns a partial dict (an
+    internal/edge-case failure), the absent entry must be treated as
+    inconclusive rather than a definitive ``INVALID_PATH``, so it is neither
+    cached nor reported as a bogus subpath. The present entry is unaffected.
+    Uses a fake executor so no real subprocess/network runs.
+    """
+    import concurrent.futures
+
+    # Both share base ``github/codeql-action`` so they land in one group whose
+    # single worker future returns a dict containing only ``present``.
+    present = ("github/codeql-action/init", "v3")
+    missing = ("github/codeql-action/analyze", "v3")
+
+    class _FakeExecutor:
+        def __init__(self, *_args: object, **_kwargs: object) -> None:
+            pass
+
+        def __enter__(self) -> _FakeExecutor:
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            return None
+
+        def submit(
+            self, _fn: object, *_args: object, **_kwargs: object
+        ) -> concurrent.futures.Future[object]:
+            future: concurrent.futures.Future[object] = (
+                concurrent.futures.Future()
+            )
+            future.set_result({present: ValidationResult.VALID})
+            return future
+
+    monkeypatch.setattr(git_validator, "ThreadPoolExecutor", _FakeExecutor)
+
+    client = GitValidationClient(GitConfig())
+    results = await client.validate_subpaths_batch([present, missing])
+
+    assert results[present] == ValidationResult.VALID
+    assert results[missing] == ValidationResult.NETWORK_ERROR

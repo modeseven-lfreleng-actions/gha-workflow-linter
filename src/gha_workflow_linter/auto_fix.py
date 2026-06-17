@@ -1704,8 +1704,10 @@ class AutoFixer:
                 # Use git ls-remote to get the SHA for the reference
                 import subprocess
 
-                # Try as branch
-                cmd = ["git", "ls-remote", "--heads", url, ref]
+                # Try as branch. The ``--`` end-of-options marker stops git
+                # from misreading a ref beginning with "-" (REF_PATTERN allows
+                # it) as an option (argument injection).
+                cmd = ["git", "ls-remote", "--heads", "--", url, ref]
                 try:
                     result = subprocess.run(
                         cmd,
@@ -1727,6 +1729,7 @@ class AutoFixer:
                     "git",
                     "ls-remote",
                     "--tags",
+                    "--",
                     url,
                     f"refs/tags/{ref}",
                     f"refs/tags/{ref}^{{}}",
