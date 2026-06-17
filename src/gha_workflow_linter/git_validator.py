@@ -6,9 +6,9 @@
 from __future__ import annotations
 
 import asyncio
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 import logging
-import multiprocessing
+import os
 import re
 import tempfile
 from typing import TYPE_CHECKING
@@ -63,7 +63,7 @@ class GitValidationClient:
             self._max_workers = config.max_parallel_operations
         else:
             # Use CPU count, but cap at reasonable limits
-            cpu_count = multiprocessing.cpu_count()
+            cpu_count = os.cpu_count() or 4
             self._max_workers = min(max(cpu_count, 4), 16)
 
         self.logger.debug(
@@ -89,10 +89,14 @@ class GitValidationClient:
             f"Validating {len(repositories)} repositories using Git"
         )
 
-        # Use asyncio to run the multiprocessing validation
+        # Run the blocking Git operations in a thread pool. The work is
+        # I/O-bound (it shells out to ``git``), so threads avoid the per-call
+        # process-pool startup cost and the multiprocessing start-method
+        # differences across platforms / Python versions (e.g. Python 3.14
+        # defaulting to ``forkserver`` on Linux).
         loop = asyncio.get_running_loop()
 
-        with ProcessPoolExecutor(max_workers=self._max_workers) as executor:
+        with ThreadPoolExecutor(max_workers=self._max_workers) as executor:
             # Submit all validation tasks
             futures = [
                 loop.run_in_executor(
@@ -170,7 +174,7 @@ class GitValidationClient:
         loop = asyncio.get_running_loop()
         results = {}
 
-        with ProcessPoolExecutor(max_workers=self._max_workers) as executor:
+        with ThreadPoolExecutor(max_workers=self._max_workers) as executor:
             # Submit validation tasks grouped by repository
             futures = []
             repo_ref_list = []
@@ -282,7 +286,7 @@ class GitValidationClient:
         loop = asyncio.get_running_loop()
         results: dict[tuple[str, str], ValidationResult] = {}
 
-        with ProcessPoolExecutor(max_workers=self._max_workers) as executor:
+        with ThreadPoolExecutor(max_workers=self._max_workers) as executor:
             futures = []
             entry_groups: list[list[tuple[str, str]]] = []
             for base, entries in repo_to_entries.items():
@@ -349,7 +353,7 @@ def _validate_repository_exists(
     """
     Validate that a repository exists and is accessible via Git.
 
-    This function runs in a separate process.
+    This function runs in a worker thread.
 
     Args:
         repository: Repository name (org/repo format)
@@ -383,7 +387,7 @@ def _validate_repository_references(
     """
     Validate multiple references for a single repository.
 
-    This function runs in a separate process.
+    This function runs in a worker thread.
 
     Args:
         repository: Repository name (org/repo format)
@@ -902,7 +906,7 @@ def _validate_repository_subpaths(
     """
     Validate that subdirectory subpaths exist at their referenced ref.
 
-    Runs in a separate process. Performs one partial (``--filter=blob:none``)
+    Runs in a worker thread. Performs one partial (``--filter=blob:none``)
     shallow fetch per unique ref into a throwaway repository, then checks the
     candidate paths with ``git ls-tree``. ``blob:none`` keeps file *contents*
     off the wire while still downloading the tree objects ``ls-tree`` needs, so
