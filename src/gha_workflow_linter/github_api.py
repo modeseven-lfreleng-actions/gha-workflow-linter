@@ -727,7 +727,7 @@ class GitHubGraphQLClient:
             Dictionary mapping ``(repo_key, ref)`` to subpath-existence result.
         """
         query_parts: list[str] = []
-        # alias -> (cache_key, list of candidate aliases)
+        # (repo_key, ref) -> list of candidate GraphQL field aliases
         entry_aliases: dict[tuple[str, str], list[str]] = {}
 
         for i, (repo_key, ref) in enumerate(subpath_refs):

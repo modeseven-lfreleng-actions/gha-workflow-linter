@@ -327,10 +327,17 @@ class GitValidationClient:
                         self.api_stats.increment_failed_call()
                 elif isinstance(group_result, dict):
                     for entry in entries:
-                        results[entry] = group_result.get(
-                            entry, ValidationResult.INVALID_PATH
-                        )
-                        self.api_stats.increment_git()
+                        if entry in group_result:
+                            results[entry] = group_result[entry]
+                            self.api_stats.increment_git()
+                        else:
+                            # A missing per-entry result means the worker
+                            # returned a partial dict (an internal/edge-case
+                            # failure), not a definitive absence. Treat it as
+                            # inconclusive so it is not cached or reported as a
+                            # bogus INVALID_PATH.
+                            results[entry] = ValidationResult.NETWORK_ERROR
+                            self.api_stats.increment_failed_call()
                     self.api_stats.git_clone_operations += 1
                 else:
                     for entry in entries:
@@ -1044,6 +1051,9 @@ def _run_git_fetch_partial(
         "--filter=blob:none",
         "--no-tags",
         "--quiet",
+        # End option parsing so a ref beginning with "-" (REF_PATTERN allows
+        # it) cannot be misread by git as an option (argument injection).
+        "--",
         url,
         ref,
     ]
