@@ -81,11 +81,13 @@ runs:
 
     - name: "Install gha-workflow-linter (if local)"
       shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
       run: |
-        if [[ -f "${{ github.action_path }}/pyproject.toml" ]]; then
+        if [[ -f "$ACTION_PATH/pyproject.toml" ]]; then
           # Install from local source when running from the action repository
           echo "Installing gha-workflow-linter from local source..."
-          cd "${{ github.action_path }}"
+          cd "$ACTION_PATH"
           uv pip install --system -e .
           echo "USE_UVX=false" >> "$GITHUB_ENV"
         else

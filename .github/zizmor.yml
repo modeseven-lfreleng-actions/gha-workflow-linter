@@ -16,6 +16,11 @@ rules:
   artipacked:
     ignore:
       - test.yaml
+      - test-skip-testing.yaml
+  concurrency-limits:
+    ignore:
+      - test.yaml
+      - test-skip-testing.yaml
   excessive-permissions:
     ignore:
       - test.yaml
@@ -26,3 +31,11 @@ rules:
   known-vulnerable-actions:
     ignore:
       - test.yaml
+  ref-version-mismatch:
+    ignore:
+      - test.yaml
+      - test-skip-testing.yaml
+  stale-action-refs:
+    ignore:
+      - test.yaml
+      - test-skip-testing.yaml
