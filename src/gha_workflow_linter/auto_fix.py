@@ -57,7 +57,6 @@ def _parse_version(tag: str) -> tuple[int, int, int]:
     version = tag.lstrip("v").split("-")[0].split("+")[0]
     parts = version.split(".")
 
-    # Parse and validate version components
     try:
         major = int(parts[0]) if len(parts) > 0 else 0
         minor = int(parts[1]) if len(parts) > 1 else 0
@@ -108,7 +107,6 @@ def _find_most_specific_version_tag(
     if not matching_tags:
         return tag
 
-    # Parse the base version from the original tag
     try:
         base_version = _parse_version(tag)
     except ValueError:
@@ -281,7 +279,6 @@ class AutoFixer:
 
         # Use the same validation method as the main validation process
         if self.config.validation_method == ValidationMethod.GITHUB_API:
-            # Initialize GraphQL client for batch queries
             self._graphql_client = GitHubGraphQLClient(self.config.github_api)
             await self._graphql_client.__aenter__()
         else:
@@ -297,7 +294,6 @@ class AutoFixer:
         if self._http_client:
             await self._http_client.aclose()
 
-        # Save cache to persist repository redirects
         self._cache.save()
 
     async def fix_validation_errors(
@@ -471,7 +467,6 @@ class AutoFixer:
                     }
                 )
 
-        # Return fixes and redirect statistics
         redirect_stats = {
             "actions_moved": len(self._redirects_found),
             "calls_updated": self._redirect_updates,
@@ -551,7 +546,6 @@ class AutoFixer:
             list
         )
 
-        # Step 1: Collect unique repositories
         unique_repos: set[str] = set()
         action_call_list: list[tuple[Path, int, ActionCall]] = []
 
@@ -578,8 +572,6 @@ class AutoFixer:
         if not action_call_list:
             return fixes_by_file, skipped_by_file, {}
 
-        # Step 1.5: Handle INVALID_REFERENCE and INVALID_REPOSITORY errors
-        # Build a map of (file_path, line_num) -> ValidationResult for quick lookup
         validation_result_map: dict[tuple[Path, int], ValidationResult] = {}
         if validation_errors:
             for error in validation_errors:
@@ -605,17 +597,14 @@ class AutoFixer:
                 )
             )
 
-        # Step 2: Batch-fetch latest versions for all unique repos
         latest_versions = await self._get_latest_versions_batch(
             list(unique_repos)
         )
 
-        # Step 3: Collect refs that need SHA resolution and check redirects
         refs_to_resolve: list[tuple[str, str]] = []
         redirect_map: dict[str, str] = {}
         redirected_repos: list[str] = []
 
-        # Check redirects in parallel with rate limiting
         semaphore = asyncio.Semaphore(20)  # Limit concurrent HEAD requests
 
         async def check_redirect_with_limit(
@@ -626,12 +615,10 @@ class AutoFixer:
                 new_repo = await self._detect_repository_redirect(repo_key)
                 return repo_key, new_repo
 
-        # Execute all redirect checks concurrently
         redirect_results = await asyncio.gather(
             *[check_redirect_with_limit(rk) for rk in unique_repos]
         )
 
-        # Process results
         for repo_key, new_repo in redirect_results:
             if new_repo:
                 redirect_map[repo_key] = new_repo
@@ -655,7 +642,6 @@ class AutoFixer:
                         live.update(new_location_msg)
                         await asyncio.sleep(0.3)
 
-        # Fetch latest versions for redirected repositories
         if redirected_repos:
             if show_live_updates and live:
                 live.update(
@@ -704,7 +690,6 @@ class AutoFixer:
         # Convert set to list for batch processing
         refs_to_resolve = list(refs_to_resolve_set)
 
-        # Step 4: Batch-fetch SHAs for all refs that need resolution
         if refs_to_resolve:
             if show_live_updates and live:
                 live.update(
@@ -717,7 +702,6 @@ class AutoFixer:
         else:
             sha_map = {}
 
-        # Step 5: Check for updates using pre-fetched data
         if show_live_updates and live:
             live.update(
                 Text(
@@ -736,7 +720,6 @@ class AutoFixer:
                     base_repo_key  # Keep original for comparison
                 )
 
-                # Get relative path for reporting
                 try:
                     relative_path = (
                         str(file_path.relative_to(self.base_path))
@@ -765,7 +748,6 @@ class AutoFixer:
                 # Check if this action has an invalid reference
                 has_invalid_ref = (file_path, line_num) in invalid_ref_actions
 
-                # Handle invalid references first, before checking for updates
                 if has_invalid_ref:
                     # For invalid references, try to find a valid replacement
                     # Priority: 1) version from comment (if valid), 2) latest version, 3) fallback reference
@@ -846,7 +828,6 @@ class AutoFixer:
                                 else "main"
                             )
 
-                        # Get SHA for the fallback reference
                         if valid_ref and not valid_sha:
                             if (base_repo_key, valid_ref) in sha_map:
                                 valid_sha = sha_map[(base_repo_key, valid_ref)]
@@ -1009,7 +990,6 @@ class AutoFixer:
 
                             # Only fix if we have a valid reference
                             if fix_ref:
-                                # Build the fixed line with current version
                                 fixed_line = self._build_fixed_line(
                                     action_call,
                                     fix_ref,
@@ -1035,7 +1015,6 @@ class AutoFixer:
                                             Text(update_msg, style="dim")
                                         )
                         elif ref_changed or comment_changed or repo_changed:
-                            # Build the fixed line
                             fixed_line = self._build_fixed_line(
                                 action_call,
                                 final_ref,
@@ -1361,7 +1340,6 @@ class AutoFixer:
                 elif invalid_ref == "main" and "master" in branches:
                     return "master"
                 elif invalid_ref.startswith("invalid"):
-                    # Return the first common default branch found
                     for default_branch in ["main", "master"]:
                         if default_branch in branches:
                             return default_branch
@@ -1458,7 +1436,6 @@ class AutoFixer:
         self, repo_key: str, invalid_ref: str
     ) -> str | None:
         """Try to find a valid reference similar to the invalid one."""
-        # Check cache first for known references
         for potential_ref in [invalid_ref, "main", "master"]:
             cached_entry = self._cache.get(repo_key, potential_ref)
             if (
@@ -1488,7 +1465,6 @@ class AutoFixer:
                         if api_tag["name"].startswith(invalid_ref):
                             return api_tag["name"]  # type: ignore[no-any-return]
 
-                # Check branches for partial matches
                 api_branches = await self._get_branches(repo_key, limit=20)
                 for api_branch in api_branches:
                     if api_branch["name"] == invalid_ref or api_branch[
@@ -1509,7 +1485,6 @@ class AutoFixer:
             try:
                 url = f"https://github.com/{repo_key}.git"
 
-                # Get all branches and tags
                 git_branches = _get_remote_branches(url, self.config.git)
                 git_tags = _get_remote_tags(url, self.config.git)
 
@@ -1525,7 +1500,6 @@ class AutoFixer:
                         if git_tag.startswith(invalid_ref):
                             return git_tag
 
-                # Check branches for partial matches
                 for git_branch in git_branches:
                     if git_branch == invalid_ref or git_branch.endswith(
                         invalid_ref
@@ -1556,8 +1530,13 @@ class AutoFixer:
                     f"https://api.github.com/repos/{repo_key}/git/refs/tags/{ref}"
                 )
                 return bool(response.status_code == 200)
-            except Exception:
-                pass
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:
+                self.logger.debug(
+                    f"GitHub API reference check failed for {repo_key}@{ref}: {exc}",
+                    exc_info=True,
+                )
 
         # Use Git operations if we're in Git validation mode
         if (
@@ -1569,8 +1548,11 @@ class AutoFixer:
                 git_branches = _get_remote_branches(url, self.config.git)
                 git_tags = _get_remote_tags(url, self.config.git)
                 return ref in git_branches or ref in git_tags
-            except GitError:
-                pass
+            except GitError as exc:
+                self.logger.debug(
+                    f"Git reference check failed for {repo_key}@{ref}: {exc}",
+                    exc_info=True,
+                )
 
         return False
 
@@ -1588,8 +1570,13 @@ class AutoFixer:
                 )
                 response.raise_for_status()
                 return response.json()  # type: ignore[no-any-return]
-            except Exception:
-                pass
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:
+                self.logger.debug(
+                    f"GitHub API tag lookup failed for {repo_key}: {exc}",
+                    exc_info=True,
+                )
 
         # Use Git operations if we're in Git validation mode - convert to API-like format
         if (
@@ -1604,8 +1591,11 @@ class AutoFixer:
                     {"name": tag}
                     for tag in sorted(git_tags, reverse=True)[:limit]
                 ]
-            except GitError:
-                pass
+            except GitError as exc:
+                self.logger.debug(
+                    f"Git tag lookup failed for {repo_key}: {exc}",
+                    exc_info=True,
+                )
 
         return []
 
@@ -1623,8 +1613,13 @@ class AutoFixer:
                 )
                 response.raise_for_status()
                 return response.json()  # type: ignore[no-any-return]
-            except Exception:
-                pass
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:
+                self.logger.debug(
+                    f"GitHub API branch lookup failed for {repo_key}: {exc}",
+                    exc_info=True,
+                )
 
         # Use Git operations if we're in Git validation mode - convert to API-like format
         if (
@@ -1638,8 +1633,11 @@ class AutoFixer:
                 return [
                     {"name": branch} for branch in sorted(git_branches)[:limit]
                 ]
-            except GitError:
-                pass
+            except GitError as exc:
+                self.logger.debug(
+                    f"Git branch lookup failed for {repo_key}: {exc}",
+                    exc_info=True,
+                )
 
         return []
 
@@ -1782,7 +1780,6 @@ class AutoFixer:
         # Check session cache first (fastest)
         current_time = time.time()
         for repo_key in repo_keys:
-            # Check in-memory session cache
             if repo_key in self._latest_versions_cache:
                 tag, sha, timestamp = self._latest_versions_cache[repo_key]
                 if current_time - timestamp < self._cache_ttl:
@@ -1790,7 +1787,6 @@ class AutoFixer:
                     session_cache_hits += 1
                     continue
 
-            # Check persistent disk cache
             cached_version = self._cache.get_latest_version(repo_key)
             if cached_version:
                 tag, sha = cached_version
@@ -1831,7 +1827,6 @@ class AutoFixer:
                     )
                     self._cache.put_latest_version(repo_key, tag, sha)
 
-                # Check which repos didn't get results from GraphQL
                 repos_to_fetch = [
                     repo
                     for repo in repos_to_fetch
@@ -1871,7 +1866,6 @@ class AutoFixer:
                 self._latest_versions_cache[repo_key] = (tag, sha, current_time)
                 self._cache.put_latest_version(repo_key, tag, sha)
 
-        # Save persistent cache to disk after batch operation
         self._cache.save()
 
         return results
@@ -1935,7 +1929,6 @@ class AutoFixer:
 
         query = f"query {{ {' '.join(query_parts)} }}"
 
-        # Execute GraphQL query using the client
         try:
             if not self._graphql_client:
                 return {}
@@ -1944,8 +1937,9 @@ class AutoFixer:
             )
 
             results = {}
+            response_root = response_data.get("data") or {}
             for alias, repo_key in aliases.items():
-                repo_data = response_data.get("data", {}).get(alias)
+                repo_data = response_root.get(alias)
                 if not repo_data:
                     continue
 
@@ -1958,7 +1952,8 @@ class AutoFixer:
                 # as undated and skipped while a cooldown applies. The latest
                 # release's publication date is layered on separately by
                 # ``_select_cooldown_version_graphql``.
-                refs = repo_data.get("refs", {}).get("nodes", [])
+                refs_field = repo_data.get("refs") or {}
+                refs = refs_field.get("nodes") or []
                 all_tags = []
                 tag_dates: dict[str, datetime | None] = {}
                 for ref in refs:
@@ -2036,7 +2031,6 @@ class AutoFixer:
                     fallback_tags = []
                     for ref in refs:
                         if fallback_pattern.match(ref["name"]):
-                            # Handle both direct commits and annotated tags
                             target = ref.get("target", {})
                             if "oid" in target:
                                 # Direct commit
@@ -2216,7 +2210,6 @@ class AutoFixer:
                         if tag is None:
                             # No release satisfies the cooldown window.
                             return None
-                        # Get SHA for this tag
                         sha_info = await self._get_commit_sha_for_reference(
                             repo_key, tag
                         )
@@ -2293,7 +2286,6 @@ class AutoFixer:
                             clean_tags, key=_parse_version, reverse=True
                         )
                         tag = sorted_versions[0]
-                        # Get SHA for this tag
                         sha_info = await self._get_commit_sha_for_reference(
                             repo_key, tag
                         )
@@ -2329,7 +2321,6 @@ class AutoFixer:
                 for repo_key, ref in refs:
                     refs_by_repo[repo_key].append(ref)
 
-                # Build batch query for all repos and their refs
                 query_parts = []
                 aliases = {}
 
@@ -2371,16 +2362,14 @@ class AutoFixer:
                     await self._graphql_client._execute_graphql_query(query)
                 )
 
-                # Parse results
+                response_root = response_data.get("data") or {}
                 for full_alias, (repo_key, ref) in aliases.items():
                     # Extract repo_idx and ref_idx from format: "repo_{repo_idx}_ref_{ref_idx}"
                     match = re.match(r"repo_(\d+)_ref_(\d+)", full_alias)
                     if match:
                         repo_alias = f"repo_{match.group(1)}"
                         ref_alias = f"ref_{match.group(2)}"
-                        repo_data = response_data.get("data", {}).get(
-                            repo_alias, {}
-                        )
+                        repo_data = response_root.get(repo_alias) or {}
                         ref_data = repo_data.get(ref_alias)
                         if ref_data:
                             target = ref_data.get("target")
@@ -2441,7 +2430,6 @@ class AutoFixer:
         Returns:
             New repository location if redirected, None otherwise
         """
-        # Check cache first
         cached = self._cache.get_redirect(repo_key)
         if cached:
             return cached
@@ -2461,7 +2449,6 @@ class AutoFixer:
                 ):
                     location = response.headers["location"]
 
-                    # Extract new repository from location header
                     match = re.search(r"github\.com/([^/]+/[^/]+)", location)
                     if match:
                         new_repo = match.group(1)
@@ -2503,7 +2490,6 @@ class AutoFixer:
         new_repo: str | None = None,
     ) -> str:
         """Build the fixed action call line."""
-        # Extract indentation and YAML structure from original line
         original_line = action_call.raw_line
 
         # Match the full structure with optional dash
@@ -2568,7 +2554,6 @@ class AutoFixer:
                         }
                     )
 
-            # Write back to file
             with open(file_path, "w", encoding="utf-8") as f:
                 f.writelines(lines)
 
